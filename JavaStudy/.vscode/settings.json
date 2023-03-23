@@ -2,6 +2,9 @@
     "java.project.sourcePaths": ["src"],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "lib/**/*.jar"
+        "lib/**/*.jar",
+        "c:\\JDK\\extlib\\mariadb-java-client-2.7.3.jar",
+        "c:\\JDK\\extlib\\HikariCP-5.0.1.jar",
+        "c:\\JDK\\extlib\\slf4j-api-2.0.6.jar"
     ]
 }
