@@ -42,7 +42,7 @@ public class lambdaExam {
         // 4. Predicate : 객체 T를 매개변수로 받아 처리한 후 Boolean으로 반환
         Predicate<String> predicate = s -> s.equals("Hello World!"); 
         System.out.println("predicate.test(\"Hello My World!\") = " + predicate.test("Hello My World!"));
-
+        // 람다식
     }
     
 }
