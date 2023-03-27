@@ -24,5 +24,6 @@ public class InnerClassTest {
         System.out.println("a = " + outerClass.a);
 
         InnerClass innerClass = outerClass.new InnerClass();
+        System.out.println(innerClass);
     }
 }

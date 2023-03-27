@@ -10,7 +10,7 @@ public class D {
 
         // 상수 선언
         final int a = 3;
-
+        System.out.println(a);
         
     }
 }
