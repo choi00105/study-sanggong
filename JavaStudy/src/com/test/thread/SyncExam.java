@@ -1,4 +1,4 @@
-package com.test.tread;
+package com.test.thread;
 
 class ExamA {
     public synchronized void examA1(String thread){

@@ -1,4 +1,4 @@
-package com.test.tread;
+package com.test.thread;
 
 public class TreadExam3 {
 

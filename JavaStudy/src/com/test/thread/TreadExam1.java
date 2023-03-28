@@ -1,4 +1,4 @@
-package com.test.tread;
+package com.test.thread;
 
 class ExamCalss implements Runnable {
 

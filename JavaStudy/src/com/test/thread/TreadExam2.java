@@ -1,4 +1,4 @@
-package com.test.tread;
+package com.test.thread;
 
 // Thread 라는 추상 클래스를 상속 받음
 class ExamCalss1 extends Thread {
