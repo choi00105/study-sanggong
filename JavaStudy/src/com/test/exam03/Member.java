@@ -1,6 +1,6 @@
 package com.test.exam03;
 
-
+// hw
 public class Member { // DTO (Data Transfer Object)
     private String userId;
     private String userName;
