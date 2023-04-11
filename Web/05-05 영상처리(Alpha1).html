@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<HTML>
+    <HEAD>
+        <script lang="javascript">
+            //함수 선언부
+            function display(img, h, w ,msg) {
+                    document.write(msg + "<br>");
+                for(i=0; i<h; i++) {
+                    for(var k=0; k<w; k++) {
+                        var space = "";
+                        if (img[i][k] < 10) space="00"
+                        else if(img[i][k] < 100) space = "0";
+                        document.write(space +img[i][k] + ' ');
+                    }
+                    document.write("<br>");
+                }
+                document.write("<br><br>");
+            }
+
+            // 전역 번수부
+            var inImage, outImage;
+            var inH, inW, outH, outW;
+
+
+
+            //메인 코드부
+            // 이미지 파일을 선택. 크기가 다름...(GrayScale은 정사각형)
+            // inH = inW = Math.floor(Math.random() * 6 + 5); // 5~10 크기 영상
+            inH = inW =3;
+
+            // 메모리 확보
+            inImage = new Array(inH);
+            for(var i = 0; i<inH; i++) {
+                inImage[i] = new Array(inW);
+            }
+
+            // 파일 -> 메모리 로딩
+            for(i=0; i<inH; i++) {
+                for(var k=0; k<inW; k++) {
+                    // [i][k] 값을 읽기
+                    inImage[i][k] = Math.floor(Math.random() * 256);
+                }
+            }
+            display(inImage, inH, inW, "원본");
+
+            
+
+            // (4) 영상처리 알고리즘
+            
+            // -1 밝게하기 + -2 어둡게 하기
+            // var value = parseInt(prompt("빍게하기", "50"));
+            // (중요!) 출력 영상 메모리 확보  -> 알고리즘에 의존
+            outH = inH;
+            outW = inW;
+            outImage = new Array(outH);
+            for(var i = 0; i<outH; i++) {
+                outImage[i] = new Array(outW);
+            }
+            // ===== 아래가 알고리즘 부분
+            
+
+            value = -50; 
+            document.write(value);
+            for(i=0; i<inH; i++) {
+                for(var k=0; k<inW; k++) {
+                    outImage[i][k] = inImage[i][k] + value;
+                    if(outImage[i][k] > 256) outImage[i][k] = 255;
+                    if(outImage[i][k] < 0) outImage[i][k] = 0;
+                    
+                }
+            }
+            display(outImage, outH, outW, " 밝기 조절 하기")
+
+
+            // -3 흑백
+            for(i=0; i<inH; i++) {
+                for(k=0; k<inW; k++) {
+                    outImage[i][k] = inImage[i][k];
+                    if(outImage[i][k] < 123)
+                        outImage[i][k] = 0;
+                    else
+                        outImage[i][k] = 255;
+                }
+            }
+            display(outImage, outH, outW, " 흑 백 영상")
+
+            // -4 반전
+            for(i=0; i<inH; i++) {
+                for(k=0; k<inW; k++) {
+                    outImage[i][k] = inImage[i][k];
+                    if(outImage[i][k] < 123){
+                        outImage[i][k] = 255-outImage[i][k];
+                    }
+                    else
+                    outImage[i][k]=Math.abs(outImage[i][k] - 255);
+                }
+            }
+            display(outImage, outH, outW, " 반전 처리")
+
+            // 좌우 미러링
+            for(i=0; i<inH; i++) {
+                for(k=0; k<inW; k++) {
+                    outImage[i][inW-k-1] = inImage[i][k];
+
+                }
+            }
+            display(outImage, outH, outW, " 좌우 미러링")
+
+            // 상하 미러링
+            for(i=0; i<inH; i++) {
+                for(k=0; k<inW; k++) {
+                    outImage[inH-i-1][k] = inImage[i][k];
+
+                }
+            }
+            display(outImage, outH, outW, " 상하 미러링")
+
+            // 90 180 270 회전
+            // 00 -> 20 -> 22 -> 02
+            // 01 -> 10 -> 21 -> 12
+            // 02 -> 00 -> 20 -> 22
+
+            // 012 가 y -> x -> y -> x
+            for(i=0; i<inH; i++) {
+                for(k=0; k<inW; k++) {
+                    outImage[Math.abs(k-(inH-1))][i] = inImage[i][k];
+                    // 
+                }
+            }
+           
+            display(outImage, outH, outW, " 90도");
+            
+            for(i=0; i<inH; i++) {
+
+                for(k=0; k<inW; k++) {
+                    outImage[Math.abs(i-(inH-1))][Math.abs(k-(inW-1))] = inImage[i][k];
+                    // 
+                }
+            }
+            // outImage[2][2] = inImage[0][0];
+            // outImage[2][1] = inImage[0][1];
+            // outImage[2][0] = inImage[0][2];
+            // outImage[0][2] = inImage[2][0];
+            // outImage[0][1] = inImage[2][1];
+            // outImage[0][0] = inImage[2][2];
+            
+            display(outImage, outH, outW, " 180도");
+            
+
+        </script>
+
+    </HEAD>
+
+    <BODY>
+
+    
+    </BODY>
+</HTML>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<HTML>
+    <HEAD>
+        <script lang="javascript">
+        // 함수 선어부
+            function display(str) {
+                for(i=0; i<ROW; i++) {
+                    for(var k=0; k<COL; k++) {
+                        document.write(arr2[i][k] + '\t');
+                    }
+                    document.write("<br>");
+                }
+                document.write(str +"<br><br>");
+            }
+        // 전역 변수부 
+            var arr2;
+            var ROW =3, COL=4; // -> 3행 4열 짜리 이미지라 생각
+        // java에서 int[][] arr = new arr[3][4];
+        // 메모리 확보
+            arr2 = new Array(ROW);
+            for(var i = 0; i<ROW; i++) {
+                arr2[i] = new Array(COL);
+            }
+
+        //이미지 파일 -> 메모리 로딩
+            for(i=0; i<ROW; i++) {
+                for(var k=0; k<COL; k++) {
+                    // [i][k] 값을 읽기
+                    arr2[i][k] = Math.floor(Math.random() * 256);
+                }
+            }
+            display('기본 ');
+        // // 영상처리 (이미지 100 밝게)
+        //     for(i=0; i<ROW; i++) {
+        //         for(k=0; k<COL; k++) {
+        //             if(arr2[i][k]+100 > 255)
+        //                 arr2[i][k] = 255;
+        //             else
+        //                 arr2[i][k] +=100;
+        //         }
+        //     }
+        //     display('100밝게 ');
+
+        // //  영상처리 이미지 100 어둡게 하기
+        //     for(i=0; i<ROW; i++) {
+        //         for(k=0; k<COL; k++) {
+        //             if(arr2[i][k]-100 < 0)
+        //                 arr2[i][k] = 0;
+        //             else
+        //                 arr2[i][k] -=100;
+        //         }
+        //     }
+        //     display('100 어둡게 ');
+        
+        // // 영상처리 이미지 완전 흑 or 백 처리
+        //     for(i=0; i<ROW; i++) {
+        //         for(k=0; k<COL; k++) {
+        //             if(arr2[i][k] < 123)
+        //                 arr2[i][k] = 0;
+        //             else
+        //                 arr2[i][k] = 255;
+        //         }
+        //     }
+        //     display('흑백');
+
+        // 영상처리 이미지 반전
+        // 255 -> 0 -255  0  0 -> 255 +255 0
+        // 254 -> 1 -253 -1    1-> 254 +253 256 -1
+        // 253 -> 2 -251 -2   2 -> 253 +251 257 -2
+            for(i=0; i<ROW; i++) {
+                for(k=0; k<COL; k++) {
+                    if(arr2[i][k] < 123){
+                        arr2[i][k] = 255-arr2[i][k];
+                    }
+                    else
+                    arr2[i][k]=Math.abs(arr2[i][k] - 255);
+                }
+            }
+            display('반전 ');
+        </script>
+
+    </HEAD>
+
+    <BODY>
+
+    
+    </BODY>
+</HTML>
