@@ -137,14 +137,23 @@
                     // 
                 }
             }
-            // outImage[2][2] = inImage[0][0];
-            // outImage[2][1] = inImage[0][1];
-            // outImage[2][0] = inImage[0][2];
-            // outImage[0][2] = inImage[2][0];
-            // outImage[0][1] = inImage[2][1];
-            // outImage[0][0] = inImage[2][2];
             
             display(outImage, outH, outW, " 180도");
+            
+            for(i=0; i<inH; i++) {
+                for(k=0; k<inW; k++) {
+                    outImage[k][Math.abs(i-(inH-1))] = inImage[i][k];
+                    // 
+                }
+            }
+            // outImage[0][2] = inImage[0][0];
+            // outImage[1][2] = inImage[0][1];
+            // outImage[2][2] = inImage[0][2];
+            // outImage[0][0] = inImage[2][0];
+            // outImage[1][0] = inImage[2][1];
+            // outImage[2][0] = inImage[2][2];
+            
+            display(outImage, outH, outW, " 270도");
             
 
         </script>
