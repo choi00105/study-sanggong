@@ -25,8 +25,8 @@
 
             //메인 코드부
             // 이미지 파일을 선택. 크기가 다름...(GrayScale은 정사각형)
-            // inH = inW = Math.floor(Math.random() * 6 + 5); // 5~10 크기 영상
-            inH = inW =3;
+            inH = inW = Math.floor(Math.random() * 6 + 5); // 5~10 크기 영상
+            
 
             // 메모리 확보
             inImage = new Array(inH);
@@ -76,7 +76,7 @@
             for(i=0; i<inH; i++) {
                 for(k=0; k<inW; k++) {
                     outImage[i][k] = inImage[i][k];
-                    if(outImage[i][k] < 123)
+                    if(outImage[i][k] < 128)
                         outImage[i][k] = 0;
                     else
                         outImage[i][k] = 255;
@@ -88,7 +88,7 @@
             for(i=0; i<inH; i++) {
                 for(k=0; k<inW; k++) {
                     outImage[i][k] = inImage[i][k];
-                    if(outImage[i][k] < 123){
+                    if(outImage[i][k] < 128){
                         outImage[i][k] = 255-outImage[i][k];
                     }
                     else
