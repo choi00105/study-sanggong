@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<HTML>
+    <HEAD>
+        <script lang="javascript">
+            // 전역 변수부
+            var inCanvas, inCtx;
+            var inFile, inImage, inH, inW;
+            var inPaper;
+
+            // 함수 선언부
+            function init() {
+                inCanvas =document.getElementById("inCanvas"); // 도화지에 접근
+                inCtx = inCanvas.getContext("2d"); // 물감 , 붓, 물통
+            }
+            function openRawImg() {
+                // 선택한 RAW 데이터를 읽어서 처리하기
+                inFile = document.getElementById('inFile').files[0]; //
+                // (중요 !) 이미지 폭과 높이를 계산
+                inH = inW =  Math.floor(Math.sqrt(inFile.size));
+                console.log(inFile.size)
+                // 메모리 확보
+                inImage = new Array(inH);
+                for(var i = 0; i<inH; i++) {
+                    inImage[i] = new Array(inW);
+                }
+                // 캔버스 크기 조절
+                inCanvas.height =inH;
+                inCanvas.width = inW;
+
+                // RAW -> 메모리(배열)로 로딩
+                var reader = new FileReader(); // 파일 객체
+                reader.readAsBinaryString(inFile);
+                reader.onload = function() {
+                    var blob = reader.result; // 파일을 한 덩어리(blob)에 넣기
+                    // blob에서 한점씩 (256 * 256) 뽑아서 2치원 배열에 넣기
+                    for (var i = 0; i<inH; i++){
+                        for (var k = 0; k<inH; k++){
+                            var sPixel = (i*inH + k); // 시작 위치
+                            var ePixel = (i*inH + k) + 1; // 끝 위치
+                            inImage[i][k] = blob.slice(sPixel, ePixel).charCodeAt(0); // 한점만 썰어내기 & ex) '뺇' -> 253
+
+                        }
+                    }
+                // 입력 메모리를 paper에 콕콕 찍기
+                    inPaper = inCtx.createImageData(inH, inW);
+                    for (var i = 0; i<inH; i++){
+                        for (var k = 0; k<inW; k++){
+                            var px = inImage[i][k];
+                            inPaper.data[(i*inH +k) *4 + 0] = px; // R
+                            inPaper.data[(i*inH +k) *4 + 1] = px; // G
+                            inPaper.data[(i*inH +k) *4 + 2] = px; // B
+                            inPaper.data[(i*inH +k) *4 + 3] = 255; // Alpha
+                    
+                        }
+                    }
+                    
+                    inCtx.putImageData(inPaper, 0, 0);
+
+                }
+                
+                
+            }
+        </script>
+
+    </HEAD>
+
+    <BODY onload="init()">
+        <input type="file" id="inFile" onchange="openRawImg()"/>
+        <canvas id="inCanvas" height="256" width = "256"
+        style = "background-color: yellow;">
+    
+    </BODY>
+</HTML>

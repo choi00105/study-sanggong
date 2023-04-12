@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <input type="file" id="fileInput" accept=".raw">
+  <canvas id="myCanvas" height="256"></canvas>
+  <script>
+    // input 요소 가져오기
+    const fileInput = document.getElementById("fileInput");
+
+    // input 파일 선택 시 이벤트 핸들러 등록
+    fileInput.addEventListener("change", function(event) {
+      const inFile = event.target.files[0];
+      const reader = new FileReader();
+      const inW = inH = Math.floor(Math.sqrt(inFile.size))
+
+      // 파일 로드 완료 시 이벤트 핸들러 등록
+      reader.onload = function(e) {
+        const rawData = new Uint8Array(e.target.result);
+        // const rawData = new Uint8ClampedArray(e.target.result);
+
+        // canvas 요소 가져오기
+        const canvas = document.getElementById("myCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // 이미지 데이터를 canvas에 그리기
+        canvas.height=inH;
+        canvas.width=inW;
+        const imageData = ctx.createImageData(inW, inH);
+
+        console.log(Math.floor(Math.sqrt(inFile.size)), inH, inW);
+
+        imageData.data.set(rawData);
+        console.log(imageData)
+        console.log(imageData.data)
+        ctx.putImageData(imageData, 0, 0);
+      };
+
+      // 파일을 ArrayBuffer로 읽어오기
+      reader.readAsArrayBuffer(inFile);
+    });
+  </script>
+</body>
+</html>

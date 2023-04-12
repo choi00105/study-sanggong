@@ -89,10 +89,8 @@
                 for(k=0; k<inW; k++) {
                     outImage[i][k] = inImage[i][k];
                     if(outImage[i][k] < 128){
-                        outImage[i][k] = 255-outImage[i][k];
+                        outImage[i][k] = 255 - inImage[i][k];
                     }
-                    else
-                    outImage[i][k]=Math.abs(outImage[i][k] - 255);
                 }
             }
             display(outImage, outH, outW, " 반전 처리")

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<HTML>
+    <HEAD>
+        <script lang="javascript">
+            var inCanvas, inCtx, outCanvas, outCtx;
+            var inImage, inH, inW;
+            var outImage, outH, outW;
+            var inPaper, outPaper;
+            var inFile;
+
+            // =============== 공통 함수부 
+            function init() {
+                inCanvas =document.getElementById("inCanvas"); // 도화지에 접근
+                inCtx = inCanvas.getContext("2d"); // 물감 , 붓, 물통
+                outCanvas =document.getElementById("outCanvas"); // 도화지에 접근
+                outCtx = outCanvas.getContext("2d"); // 물감 , 붓, 물통
+                
+
+            }
+            function openRawImage() {
+                // 선택한 RAW 데이터를 읽어서 처리하기
+                inFile = document.getElementById('inFile').files[0]; //
+                // (중요 !) 이미지 폭과 높이를 계산
+                inH = inW =  Math.floor(Math.sqrt(inFile.size));
+                console.log(inFile.size, inH, inW)
+                // 메모리 확보
+                inImage = new Array(inH);
+                for(var i = 0; i<inH; i++) {
+                    inImage[i] = new Array(inW);
+                }
+                // 캔버스 크기 조절
+                inCanvas.height =inH;
+                inCanvas.width = inW;
+
+                // RAW -> 메모리(배열)로 로딩
+                var reader = new FileReader(); // 파일 객체
+                reader.readAsBinaryString(inFile);
+                reader.onload = function() {
+                    var blob = reader.result; // 파일을 한 덩어리(blob)에 넣기
+                    // blob에서 한점씩 (256 * 256) 뽑아서 2치원 배열에 넣기
+                    for (var i = 0; i<inH; i++){
+                        for (var k = 0; k<inH; k++){
+                            var sPixel = (i*inH + k); // 시작 위치
+                            var ePixel = (i*inH + k) + 1; // 끝 위치
+                            inImage[i][k] = blob.slice(sPixel, ePixel).charCodeAt(0); // 한점만 썰어내기 & ex) '뺇' -> 253
+
+                        }
+                    }
+                    displayImage();
+                
+                }
+            }
+
+            function displayImage() {
+                // 입력 메모리를 paper에 콕콕 찍기
+                if(inFile){
+                inPaper = inCtx.createImageData(inH, inW);
+                    for (var i = 0; i<inH; i++){
+                        for (var k = 0; k<inW; k++){
+                            var px = inImage[i][k];
+                            inPaper.data[(i*inH +k) *4 + 0] = px; // R
+                            inPaper.data[(i*inH +k) *4 + 1] = px; // G
+                            inPaper.data[(i*inH +k) *4 + 2] = px; // B
+                            inPaper.data[(i*inH +k) *4 + 3] = 255; // Alpha
+                        }
+                    }
+                inCtx.putImageData(inPaper, 0, 0);
+                } else {
+                    alert('파일 선택 ㄱ ㄱ');
+                    document.getElementsByName('pixel')[0].value = 0;
+                }
+
+
+                // 출력 메모리를 paper에 콕콕 찍기
+                if(outH){
+                outPaper = outCtx.createImageData(outH, outW);
+                    for (var i = 0; i<outH; i++){
+                        for (var k = 0; k<outW; k++){
+                            var px = outImage[i][k];
+                            outPaper.data[(i*outH +k) *4 + 0] = px; // R
+                            outPaper.data[(i*outH +k) *4 + 1] = px; // G
+                            outPaper.data[(i*outH +k) *4 + 2] = px; // B
+                            outPaper.data[(i*outH +k) *4 + 3] = 255; // Alpha
+                        }
+                    }
+                outCtx.putImageData(outPaper, 0, 0);
+                }
+            }
+
+            function selectAlgo(selectNum) {
+                switch(parseInt(selectNum.value)){
+                    case 100: equl_image(); break;
+                    case 101: add_image(); break;
+                    case 102: reverse_image(); break;
+                    case 103: mirror_image(); break;
+                    case 104: vertical_flip(); break;
+                    case 105: rotate_90_degrees(); break;
+                    case 106: rotate_180_degrees(); break;
+                    case 107: rotate_270_degrees(); break;
+                    case 108: black_or_white(); break;
+                    case 109: sharpening(); break;
+                }
+            }
+
+            // =============== 영상처리 함수부 ***
+            function equl_image() {
+                // (중요!) 출력 영상의 크기를 결정 -> 알고리즘에 따라 다름
+                
+                outH = inH;
+                outW = inW;
+                // 출력 이미지 할당
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ** 진짜 영상처리 알고리즘 구현
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        outImage[i][k] = inImage[i][k];
+                    }
+                }
+                // **************************
+                displayImage();
+            }
+
+            function add_image() {
+                // (중요!) 출력 영상의 크기를 결정 -> 알고리즘에 따라 다름
+                outH = inH;
+                outW = inW;
+                // 출력 이미지 할당
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ** 진짜 영상처리 알고리즘 구현
+                var value= parseInt(prompt("값", 50));
+                if(!value||!isInteger(value)) {alert('취소 버튼 or 잘못된 입력으로 취도됨'); return 0;}
+                // value에 아무것도 입력 안하거나 취소, 숫자가 아닌값 들어가면 
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        if(inImage[i][k] + value < 0) outImage[i][k] = 0;
+                        else if(inImage[i][k] + value > 256) outImage[i][k] = 255;
+                        else outImage[i][k] = inImage[i][k] + value;
+                    }
+                }
+                // **************************
+                displayImage();
+            }
+            function reverse_image() {
+                // (중요!) 출력 영상의 크기를 결정 --> 알고리즘에 따름.
+                outH = inH;
+                outW = inW;
+                // 출력 이미지 메모리 할당.
+                outImage = new Array(outH);
+                for(var i=0; i<outH; i++)
+                    outImage[i] = new Array(outW);
+                // ** 진짜 영상처리 알고리즘 구현 **
+                for(var i=0; i<inH; i++) {
+                    for (var k=0; k<inW; k++) {
+                        outImage[i][k] = 255 - inImage[i][k];
+                    }
+                }
+                // *******************************
+                displayImage();
+            }
+            
+            function mirror_image() {   
+                outH = inH;
+                outW = inW;
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ** 진짜 영상처리 알고리즘 구현
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        outImage[i][inW-k-1] = inImage[i][k];
+                    }
+                }
+                displayImage();
+            }
+            function vertical_flip() {   
+                outH = inH;
+                outW = inW;
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ** 진짜 영상처리 알고리즘 구현
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        outImage[inH-i-1][k] = inImage[i][k];
+                    }
+                }
+                displayImage();
+            }
+            function rotate_90_degrees() {   
+                outH = inH;
+                outW = inW;
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ** 진짜 영상처리 알고리즘 구현
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        outImage[Math.abs(k-(inH-1))][i] = inImage[i][k];
+                    }
+                }
+                displayImage();
+            }
+            function rotate_180_degrees() {   
+                outH = inH;
+                outW = inW;
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ** 진짜 영상처리 알고리즘 구현
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        outImage[Math.abs(i-(inH-1))][Math.abs(k-(inW-1))] = inImage[i][k];
+                    }
+                }
+                displayImage();
+            }
+            function rotate_270_degrees() {   
+                outH = inH;
+                outW = inW;
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ** 진짜 영상처리 알고리즘 구현
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        outImage[k][Math.abs(i-(inH-1))] = inImage[i][k];
+                    }
+                }
+                displayImage();
+            }
+            function black_or_white() {   
+                outH = inH;
+                outW = inW;
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ** 진짜 영상처리 알고리즘 구현
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        if(inImage[i][k] < 128) outImage[i][k] = 0;
+                        else outImage[i][k] = 255;
+                        // outImage[i][k] = 0;
+                    }
+                }
+                displayImage();
+            }
+            function sharpening() {   
+                outH = inH;
+                outW = inW;
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ** 진짜 영상처리 알고리즘 구현
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        if(inImage[i][k] < 40) outImage[i][k] = 0;
+                        else outImage[i][k] = inImage[i][k];
+
+                    }
+                }
+                displayImage();
+            }
+            
+        </script>
+
+    </HEAD>
+
+    <BODY onload="init()">
+        <form>
+            <input type="file" id="inFile" onchange="openRawImage()"/><br/>
+            <select name="pixel" id="" onchange="selectAlgo(this.form.pixel)">
+                <option value="0">선택하세요</option>
+                <optgroup label="화소점 처리">
+                    <option value="100">동일 영상</option>
+                    <option value="101">밝게 / 어둡게</option>
+                    <option value="102">반전</option>
+                    <option value="103">좌우 반전</option>
+                    <option value="104">상하 반전</option>
+                    <option value="105">90도 회전</option>
+                    <option value="106">180도 회전</option>
+                    <option value="107">270도 회전</option>
+                    <option value="108">흑백</option>
+                    <option value="109">선명하게</option>
+
+                </optgroup>
+            </select><br/>
+        </form>
+
+        <canvas id="inCanvas" height="256" width = "256"
+        style = "background-color: yellow;"></canvas>
+        <canvas id="outCanvas" height="256" width = "256"
+        style = "background-color: aquamarine;"></canvas>
+        
+    </BODY>
+</HTML>
