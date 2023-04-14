@@ -3,8 +3,55 @@
     <HEAD>
         <style>
             body{
+                margin-top: 80px;
                 text-align: center;
+                background-color: rgba(127, 127, 127, 0.6);
             }
+            h1{
+                font-size: 50px;
+                /* font-family: Arial, Helvetica, sans-serif; */
+                font-style: italic;
+                text-shadow: 2px 2px 2px white;
+            }
+          
+            div>#lena {
+
+                height : 64px;
+                width : 64px;
+                box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.4);
+
+            }
+            div>.arrow {
+                font-size: 50px;
+                
+            }
+            div>#lenaExample {
+
+                height : 80px;
+                box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.4);
+                transition-duration: 2s;
+
+            }
+            #lenaExample:hover {
+                height : 180px;
+            }
+            canvas {
+                border: 8px double black;
+                background-color: white;
+                margin: 20px 5px;
+                padding: 10px;
+                box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.4);
+            }
+            #inCanvas {
+                height : 256px;
+                width : 256px;
+            }
+            #outCanvas {
+                height : 256px;
+                width : 256px;
+            }
+
+
         </style>
         <script lang="javascript">
             var inCanvas, inCtx, outCanvas, outCtx;
@@ -48,11 +95,9 @@
                             var sPixel = (i*inH + k); // 시작 위치
                             var ePixel = (i*inH + k) + 1; // 끝 위치
                             inImage[i][k] = blob.slice(sPixel, ePixel).charCodeAt(0); // 한점만 썰어내기 & ex) '뺇' -> 253
-
                         }
                     }
                     displayImage();
-                
                 }
             }
 
@@ -71,11 +116,12 @@
                     }
                 inCtx.putImageData(inPaper, 0, 0);
                 
-                outCanvas.height=outH;
-                outCanvas.width=outW;
+                
 
                 // 출력 메모리를 paper에 콕콕 찍기
                 if(outH){
+                outCanvas.height=outH;
+                outCanvas.width=outW;
                 outPaper = outCtx.createImageData(outH, outW);
                     for (var i = 0; i<outH; i++){
                         for (var k = 0; k<outW; k++){
@@ -118,6 +164,10 @@
                     case 302: edge_image(); break;
                     case 303: laplacian_image(); break;
                     case 304: vertical_image(); break;
+
+                    case 400: histoSt_image(); break;
+                    case 401: endIn_image(); break;
+                    case 402: histoEqual_image(); break;
                     
                 }
             } else {
@@ -145,6 +195,104 @@
                 // *****************************************
                 displayImage();
             }
+
+            function histoSt_image() {
+                // (중요!) 출력 영상의 크기를 결정 -> 알고리즘에 따라 다름
+                outH = inH;
+                outW = inW;
+                // 출력 이미지 할당
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ************* 진짜 영상처리 알고리즘 구현*************
+                // out = (in-low) / (high - low) *255
+                var low=inImage[0][0], high = inImage[0][0];
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        if (inImage[i][k] < low) low = inImage[i][k];
+                        if (inImage[i][k] > high) high = inImage[i][k];
+                    }
+                }
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        var out = (inImage[i][k]-low) / (high - low) *255.0
+                        outImage[i][k] = parseInt(out);
+                    }
+                }
+                // *****************************************
+                displayImage();
+            }
+            function endIn_image() {
+                // (중요!) 출력 영상의 크기를 결정 -> 알고리즘에 따라 다름
+                outH = inH;
+                outW = inW;
+                // 출력 이미지 할당
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ************* 진짜 영상처리 알고리즘 구현*************
+                // out = (in-low) / (high - low) *255
+                var low=inImage[0][0], high = inImage[0][0];
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        if (inImage[i][k] < low) low = inImage[i][k];
+                        if (inImage[i][k] > high) high = inImage[i][k];
+                    }
+                }
+                low +=50;
+                high -= 50;
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        var out = (inImage[i][k]-low) / (high - low) *255.0
+                        outImage[i][k] = parseInt(out);
+                    }
+                }
+                // *****************************************
+                displayImage();
+            }
+            function histoEqual_image() {
+                // (중요!) 출력 영상의 크기를 결정 -> 알고리즘에 따라 다름
+                outH = inH;
+                outW = inW;
+                // 출력 이미지 할당
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++) {
+                    outImage[i] = new Array(outW);
+                }
+                // ************* 진짜 영상처리 알고리즘 구현*************
+                // 1 히스토그램 생성
+                var histo = new Array(256);
+                for(var i = 0; i <256; i++) //초기화
+                    histo[i] = 0;
+                for(i = 0; i < inH; i++) 
+                    for(k = 0; k <inW; k++) 
+                        histo[inImage[i][k]]++;
+                // 2 누적 히스토그램 생성
+                var sumHisto = new Array(256);
+                for (var i = 0; i< 256; i++) sumHisto[i] = 0.0;
+                var sumValue = 0;
+                for (i = 0; i<256; i++){
+                    sumValue += histo[i];
+                    sumHisto[i] = sumValue;
+                }
+                // 3 정규화된 누적 합 생성
+                // n[i] = sumHisto[i] * (1.0/(inH*inW) * 255.0)
+                var n = new Array(256);
+                for(var i = 0; i<256; i++) n[i]= 0.0;
+                for(var i = 0; i<256; i++) n[i]= sumHisto[i] * (1.0/(inH*inW) * 255.0);
+                
+                // 최종
+                for(i = 0; i < inH; i++)
+                    for(k = 0; k <inW; k++)
+                        outImage[i][k] = parseInt(n[inImage[i][k]]);
+
+                 
+                // *****************************************
+                displayImage();
+            }
+
             function embos_image() {
                 // (중요!) 출력 영상의 크기를 결정 --> 알고리즘에 따름.
                 outH = inH;
@@ -768,10 +916,19 @@
     </HEAD>
 
     <BODY onload="init()">
+        <h1>📽영상처리 알고리즘📽 </h1>
+        <div>
+            <img id="lena"src="https://upload.wikimedia.org/wikipedia/ko/2/24/Lenna.png?20170110121321" alt="lena">
+            <span class="arrow">👉-></span>
+            <img id="lenaExample"src="https://www.researchgate.net/publication/259892138/figure/fig3/AS:669224620027908@1536566991204/Example-of-image-enhancement-a-original-test-image-Lena-b-enhanced-image-by.jpg" alt="lena_example">
+
+        </div>
         <form>
+            <canvas id="inCanvas"></canvas>
+            <canvas id="outCanvas"></canvas><br/>
             <input type="file" id="inFile" onchange="openRawImage()"/><br/>
             <select name="pixel" id="" onchange="selectAlgo(this.form.pixel)">
-                <option value="0">선택하세요</option>
+                <option value="0">알고리즘을 선택하세요</option>
                 <optgroup label="화소점 처리">
                     <option value="100">동일 영상</option>
                     <option value="101">밝게 / 어둡게</option>
@@ -801,15 +958,17 @@
                     <option value="302">운곽선 추출</option>
                     <option value="303">라플라시안 앳지</option>
                     <option value="304">수직검출</option>
-
                 </optgroup>
+                <optgroup label="히스토그램 처리">
+                    <option value="400">히스토그램 스트레칭(명암대비)</option>
+                    <option value="401">앤드인 탐색</option>
+                    <option value="402">히스토그램 평활화</option>
+                </optgroup>
+                
             </select><br/>
         </form>
 
-        <canvas id="inCanvas" height="256" width = "256"
-        style = "background-color: yellow;"></canvas>
-        <canvas id="outCanvas" height="256" width = "256"
-        style = "background-color: aquamarine;"></canvas>
+        
         
     </BODY>
 </HTML>
