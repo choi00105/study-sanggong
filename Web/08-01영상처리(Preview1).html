@@ -8,6 +8,11 @@
                 text-align: center;
                 background-color: rgba(127, 127, 127, 0.6);
                 overflow: hidden;
+                -ms-user-select: none;
+                -moz-user-select: -moz-none;
+                -khtml-user-select: none;
+                -webkit-user-select: none;
+                user-select: none;
             }
 
             .title {
@@ -31,18 +36,16 @@
             }
             #mark {
                 font-size: 50px;
+            }
+            .show { 
+               display: inline-block; 
+            }
 
+            .hide { 
+                display: none; 
             }
-            #mark-show { /* 보여질 때의 스타일 */
-               display: block !important; /* 강제로 display 값을 block으로 설정 */
-            }
-
-            #mark-hide { /* 숨겨질 때의 스타일 */
-                display: none !important; /* 강제로 display 값을 none으로 설정 */
-            }
-            div > #pray {
+            #pray {
                 font-size: 50px;
-                display: none;
             }
 
             div > #lenaExample {
@@ -84,6 +87,9 @@
             }
             a {
                 text-decoration: none;
+            }
+            .stophv {
+                pointer-events: none;
             }
 
         </style>
@@ -976,18 +982,19 @@
                 displayImage();
             }
             
-            let mark = document.getElementById('mark');
-            console.log(mark)
-            let clickCount = 0;
-
-            // 클릭 이벤트 핸들러
-            mark.addEventListener('click', function() {
-  if (mark.style.display === 'none') {
-    mark.style.display = 'block'; // 숨김 -> 보여짐
-  } else {
-    mark.style.display = 'none'; // 보여짐 -> 숨김
-  }
-});
+            var mark, pray, hover1, hover2;
+            function chg(){
+            mark = document.getElementById('mark');
+            pray = document.getElementById('pray');
+            hover1 = document.getElementById('lena');
+            hover2 = document.getElementById('lenaExample');
+            mark.classList.toggle('show');
+            mark.classList.toggle('hide');
+            pray.classList.toggle('show');
+            pray.classList.toggle('hide');
+            hover1.classList.toggle('stophv');
+            hover2.classList.toggle('stophv');
+            }
             
         </script>
 
@@ -997,13 +1004,14 @@
         <h1 class="title">📽영상처리 알고리즘📽 </h1>
         <div>
             <img id="lena"src="https://www.researchgate.net/profile/Naison-Gasela/publication/237054247/figure/fig2/AS:299436317134849@1448402589122/Lena-original-gray.png" alt="lena">
-            <span id="mark">👉→</span><span id="pray">🙏🙏</span>
+            <span id="mark" class="show" ondblclick="chg()">👉→</span>
+            <span id="pray" class="hide" ondblclick="chg()">🙏🙏</span>
             <img id="lenaExample"src="https://i.stack.imgur.com/z89Ej.png" alt="lena_example">
 
         </div>
         <form>
             <div class="container">
-                <canvas id="inCanvas">select image</canvas>
+                <canvas id="inCanvas"></canvas>
                 <span class="arrow">→</span>
                 <canvas id="outCanvas"></canvas><br/>
             </div>
