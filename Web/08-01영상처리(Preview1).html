@@ -29,6 +29,21 @@
             div > .arrow {
                 font-size: 50px;
             }
+            #mark {
+                font-size: 50px;
+
+            }
+            #mark-show { /* 보여질 때의 스타일 */
+               display: block !important; /* 강제로 display 값을 block으로 설정 */
+            }
+
+            #mark-hide { /* 숨겨질 때의 스타일 */
+                display: none !important; /* 강제로 display 값을 none으로 설정 */
+            }
+            div > #pray {
+                font-size: 50px;
+                display: none;
+            }
 
             div > #lenaExample {
                 height: 80px;
@@ -96,13 +111,17 @@
 
             }
             function openRawImage() {
-                console.log(outCtx.font, outCtx.fillStyle );
-
                 // 선택한 RAW 데이터를 읽어서 처리하기
                 inFile = document.getElementById('inFile').files[0]; //
+                const fileExtension = inFile.name.split('.').pop(); // 파일 확장자 추출
+                if (fileExtension !== 'raw') {
+                    document.getElementById('inFile').value = ''; // 선택한 파일 이름 안뜨게
+                    inFile = null;
+                    alert('올바른 파일 확장자 파일을 선택해주세요\n(현재는 .raw 파일만 지원됩니다)');
+                } else {
                 // (중요 !) 이미지 폭과 높이를 계산
                 inH = inW =  Math.floor(Math.sqrt(inFile.size));
-                console.log(inFile.size, inH, inW)
+                console.log(inFile.name, fileExtension);
                 // 메모리 확보
                 inImage = new Array(inH);
                 for(var i = 0; i<inH; i++) {
@@ -133,6 +152,7 @@
                 outCtx.fillStyle = "rgb(255,255,255)";
                 outCtx.fillText("알고리즘을 선택해",30,70);
                 outCtx.fillText("주세요",100,110);
+                }
             }
 
             function displayImage() {
@@ -171,6 +191,7 @@
             }
 
             function selectAlgo(selectNum) {
+                console.log(inFile)
                 if(inFile){
                 switch(parseInt(selectNum.value)){
                     case 100: equl_image(); break;
@@ -205,7 +226,7 @@
                     
                 }
             } else {
-                    alert('파일 선택 ㄱ ㄱ');
+                    alert('파일을 먼저 선택 해주세요!');
                     document.getElementsByName('pixel')[0].value = 0;
                     inCtx.fillStyle = "white";
                     inCtx.fillRect(0, 0, inCanvas.width, inCanvas.height);
@@ -955,6 +976,19 @@
                 displayImage();
             }
             
+            let mark = document.getElementById('mark');
+            console.log(mark)
+            let clickCount = 0;
+
+            // 클릭 이벤트 핸들러
+            mark.addEventListener('click', function() {
+  if (mark.style.display === 'none') {
+    mark.style.display = 'block'; // 숨김 -> 보여짐
+  } else {
+    mark.style.display = 'none'; // 보여짐 -> 숨김
+  }
+});
+            
         </script>
 
     </HEAD>
@@ -963,7 +997,7 @@
         <h1 class="title">📽영상처리 알고리즘📽 </h1>
         <div>
             <img id="lena"src="https://www.researchgate.net/profile/Naison-Gasela/publication/237054247/figure/fig2/AS:299436317134849@1448402589122/Lena-original-gray.png" alt="lena">
-            <span class="arrow">👉→</span>
+            <span id="mark">👉→</span><span id="pray">🙏🙏</span>
             <img id="lenaExample"src="https://i.stack.imgur.com/z89Ej.png" alt="lena_example">
 
         </div>
