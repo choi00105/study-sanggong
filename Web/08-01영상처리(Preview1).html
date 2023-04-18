@@ -6,14 +6,19 @@
             body {
                 margin-top: 80px;
                 text-align: center;
-                background-color: rgba(127, 127, 127, 0.6);
-                overflow: hidden;
+                background-color: rgba(160, 160, 160);
                 -ms-user-select: none;
                 -moz-user-select: -moz-none;
                 -khtml-user-select: none;
                 -webkit-user-select: none;
                 user-select: none;
+
+                -ms-overflow-style: none;
             }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+
 
             .title {
                 margin: 10px 10px;
@@ -28,7 +33,6 @@
                 width: 64px;
                 box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.4);
                 transition-duration: 1s;
-
             }
 
             div > .arrow {
@@ -76,10 +80,6 @@
                 box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.4);
             }
 
-            #inCanvas, #outCanvas {
-                height: 256px;
-                width: 256px;
-            }
             .bottom{
                 margin: 30px 10px;
             }
@@ -123,7 +123,7 @@
                 // 선택한 RAW 데이터를 읽어서 처리하기
                 inFile = document.getElementById('inFile').files[0]; //
                 const fileExtension = inFile.name.split('.').pop(); // 파일 확장자 추출
-                if (fileExtension !== 'raw') {
+                if (fileExtension.toUpperCase() !== 'RAW') {
                     document.getElementById('inFile').value = ''; // 선택한 파일 이름 안뜨게
                     inFile = null;
                     alert('올바른 파일 확장자 파일을 선택해주세요\n(현재는 .raw 파일만 지원됩니다)');
@@ -155,8 +155,8 @@
                     }
                     displayImage();
                 }
-                outCtx.fillStyle = "rgb(0,0,0)";
-                outCtx.fillRect(0, 30, 300, 100);
+                outCtx.fillStyle = "rgb(160,160,160)";
+                outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
                 
                 outCtx.fillStyle = "rgb(255,255,255)";
                 outCtx.fillText("알고리즘을 선택해",30,70);
@@ -213,7 +213,7 @@
                     case 107: rotate_270_degrees(); break;
                     case 108: black_or_white(); break;
                     case 109: sharpening(); break;
-                    case 110: bw_image(); break;
+                    case 110: bw_image(); break; // 먕임대비 이진화
                     case 111: bw2_image(); break;
                     case 112: bw3_image(); break;
 
@@ -531,8 +531,8 @@
                     outImage[i] = new Array(outW);
                 // ** 진짜 영상처리 알고리즘 구현 **
                 // 짱! 중요
-                var mask = [    [ 0.0 ,  -1.0 ,  0.0 ], 
-                                [  -1.0 ,  2.0 ,  0.0 ], 
+                var mask = [    [  0.0 ,  -1.0 ,  0.0 ], 
+                                [ -1.0 ,  2.0 ,  0.0 ], 
                                 [  0.0 ,  0.0 ,  0.0 ]  ];
                 // 임시 입력 배열 (입력배열+2) ==> 실수 처리
                 var tmpInImage = new Array(inH+2);
@@ -584,9 +584,9 @@
                     outImage[i] = new Array(outW);
                 // ** 진짜 영상처리 알고리즘 구현 **
                 // 짱! 중요
-                var mask = [    [  0.0 ,  1.0 ,  0.0 ], 
+                var mask = [    [  0.0 ,  1.0 ,   0.0 ], 
                                 [  1.0 ,  -4.0 ,  1.0 ], 
-                                [  0.0 ,  1.0 ,  0.0 ]  ];
+                                [  0.0 ,  1.0 ,   0.0 ]  ];
                 // 임시 입력 배열 (입력배열+2) ==> 실수 처리
                 var tmpInImage = new Array(inH+2);
                 for(var i=0; i<inH+2; i++)
@@ -626,61 +626,7 @@
                 // *******************************
                 displayImage();
             }
-            function rotate_image() {
-                // (중요!) 출력 영상의 크기를 결정 -> 알고리즘에 따라 다름
-                outH = inH;
-                outW = inW;
-                // 출력 이미지 할당
-                outImage = new Array(outH);
-                for(var i = 0; i<outH; i++)
-                    outImage[i] = new Array(outW);
-                
-                // ** 진짜 영상처리 알고리즘 구현
-                var angle = parseInt(prompt("각도", 45));
-                angle = angle *Math.PI/ 180;
-                // 공식 
-                // new_i = cos*old_i -sin*old_k 
-                // new_k = sin*old_i + cos*old_k
-                for(i = 0; i < inH; i++) {
-                    for(k = 0; k <inW; k++) {
-                        var new_i = parseInt(Math.cos(angle) * i - Math.sin(angle) * k);
-                        var new_k = parseInt(Math.sin(angle) * i + Math.cos(angle) * k);
-                        if(((0 <= new_i) && (new_i < outH)) && ((0 <= new_k) && (new_k < outW)))
-                        outImage[new_i][new_k] = inImage[i][k];
-                    }
-                }
-                // **************************
-                displayImage();
-            }
-            function rotate2_image() {
-                // (중요!) 출력 영상의 크기를 결정 -> 알고리즘에 따라 다름
-                outH = inH;
-                outW = inW;
-                // 출력 이미지 할당
-                outImage = new Array(outH);
-                for(var i = 0; i<outH; i++)
-                    outImage[i] = new Array(outW);
-                
-                // ** 진짜 영상처리 알고리즘 구현
-                var angle = parseInt(prompt("각도", 45));
-                angle = angle *Math.PI/ 180;
-
-                var cx = parseInt(inH/2);
-                var cy = parseInt(inW/2);
-                // 공식 
-                // new_i = cos*(old_i-cx) - sin*(old_k-cy) +cx 
-                // new_k = sin*(old_i-cx) + cos*(old_k-cy) +cy
-                for(i = 0; i < outH; i++) {
-                    for(k = 0; k <outW; k++) {
-                        var old_i = parseInt(Math.cos(angle) * (i-cx) + Math.sin(angle) * (k-cy) +cx);
-                        var old_k = parseInt(-Math.sin(angle) * (i-cx) + Math.cos(angle) * (k-cy) +cy);
-                        if(((0 <= old_i) && (old_i < inH)) && ((0 <= old_k) && (old_k < inW)))
-                        outImage[i][k] = inImage[old_i][old_k];
-                    }
-                }
-                // **************************
-                displayImage();
-            }
+            
             function zoomOut_image() {
                 // (중요!) 출력 영상의 크기를 결정 -> 알고리즘에 따라 다름
                 var scale = parseInt(prompt("축소배율", 2))                
@@ -753,9 +699,62 @@
                 // **************************
                 displayImage();
             }
-            function bw_image() {
+            function rotate_image() {
                 // (중요!) 출력 영상의 크기를 결정 -> 알고리즘에 따라 다름
+                outH = inH;
+                outW = inW;
+                // 출력 이미지 할당
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++)
+                    outImage[i] = new Array(outW);
                 
+                // ** 진짜 영상처리 알고리즘 구현
+                var angle = parseInt(prompt("각도", 45));
+                angle = angle *Math.PI/ 180;
+                // 공식 
+                // new_i = cos*old_i -sin*old_k 
+                // new_k = sin*old_i + cos*old_k
+                for(i = 0; i < inH; i++) {
+                    for(k = 0; k <inW; k++) {
+                        var new_i = parseInt(Math.cos(angle) * i - Math.sin(angle) * k);
+                        var new_k = parseInt(Math.sin(angle) * i + Math.cos(angle) * k);
+                        if(((0 <= new_i) && (new_i < outH)) && ((0 <= new_k) && (new_k < outW)))
+                        outImage[new_i][new_k] = inImage[i][k];
+                    }
+                }
+                // **************************
+                displayImage();
+            }
+            function rotate2_image() {
+                // (중요!) 출력 영상의 크기를 결정 -> 알고리즘에 따라 다름
+                outH = inH;
+                outW = inW;
+                // 출력 이미지 할당
+                outImage = new Array(outH);
+                for(var i = 0; i<outH; i++)
+                    outImage[i] = new Array(outW);
+                
+                // ** 진짜 영상처리 알고리즘 구현
+                var angle = parseInt(prompt("각도", 45));
+                angle = angle *Math.PI/ 180;
+
+                var cx = parseInt(inH/2);
+                var cy = parseInt(inW/2);
+                // 공식 
+                // new_i = cos*(old_i-cx) - sin*(old_k-cy) +cx 
+                // new_k = sin*(old_i-cx) + cos*(old_k-cy) +cy
+                for(i = 0; i < outH; i++) {
+                    for(k = 0; k <outW; k++) {
+                        var old_i = parseInt(Math.cos(angle) * (i-cx) + Math.sin(angle) * (k-cy) +cx);
+                        var old_k = parseInt(-Math.sin(angle) * (i-cx) + Math.cos(angle) * (k-cy) +cy);
+                        if(((0 <= old_i) && (old_i < inH)) && ((0 <= old_k) && (old_k < inW)))
+                        outImage[i][k] = inImage[old_i][old_k];
+                    }
+                }
+                // **************************
+                displayImage();
+            }
+            function bw_image() {
                 outH = inH;
                 outW = inW;
                 // 출력 이미지 할당
@@ -915,7 +914,7 @@
                 // ** 진짜 영상처리 알고리즘 구현
                 for(i = 0; i < inH; i++) {
                     for(k = 0; k <inW; k++) {
-                        outImage[Math.abs(k-(inH-1))][i] = inImage[i][k];
+                        outImage[inH-1 - k][i] = inImage[i][k];
                     }
                 }
                 displayImage();
@@ -930,7 +929,7 @@
                 // ** 진짜 영상처리 알고리즘 구현
                 for(i = 0; i < inH; i++) {
                     for(k = 0; k <inW; k++) {
-                        outImage[Math.abs(i-(inH-1))][Math.abs(k-(inW-1))] = inImage[i][k];
+                        outImage[(inH-1)-i][(inW-1)-k] = inImage[i][k];
                     }
                 }
                 displayImage();
@@ -945,7 +944,7 @@
                 // ** 진짜 영상처리 알고리즘 구현
                 for(i = 0; i < inH; i++) {
                     for(k = 0; k <inW; k++) {
-                        outImage[k][Math.abs(i-(inH-1))] = inImage[i][k];
+                        outImage[k][(inH-1) - i] = inImage[i][k];
                     }
                 }
                 displayImage();
