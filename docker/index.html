@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html
+<head>
+<meta charset="utf-8">
+<style>
+.time {
+	font-size: 200px;
+}
+
+.calendar {
+	font-size: 100px;
+}
+
+.timezone {
+	height: 800px;
+	text-align: center;
+	padding: 200px 0px;
+}
+</style>
+
+<script>
+
+	const clock = () => {
+		let year = document.querySelector('#year');
+		let month = document.querySelector('#month');
+		let date = document.querySelector('#date');
+		let day = document.querySelector('#day');
+
+		let hour = document.querySelector('#hour');
+		let minute = document.querySelector('#minute');
+		let second = document.querySelector('#second');
+
+		const now = new Date();
+
+		year.innerHTML = now.getFullYear().toString();
+		month.innerHTML = parseInt(now.getMonth().toLocaleString())+1 < 10?'0'
+				+(parseInt(now.getMonth().toLocaleString())+1).toString():(parseInt(now.getMonth().toLocaleString())+1).toString();
+		date.innerHTML = parseInt(now.getDate().toLocaleString()) < 10?'0'+now.getDate().toLocaleString():now.getDate().toLocaleString();;
+
+		switch(now.getDay().toLocaleString()) {
+
+			case '0': day.innerHTML = '일요일';
+						break;
+			case '1': day.innerHTML = '월요일';
+						break;
+			case '2': day.innerHTML = '화요일';
+				break;
+			case '3': day.innerHTML = '수요일';
+				break;
+			case '4': day.innerHTML = '목요일';
+				break;
+			case '5': day.innerHTML = '금요일';
+				break;
+			case '6': day.innerHTML = '토요일';
+				break;
+		}
+
+
+		hour.innerHTML = parseInt(now.getHours().toLocaleString()) < 10?'0'+now.getHours().toLocaleString():now.getHours().toLocaleString();
+		minute.innerHTML = parseInt(now.getMinutes().toLocaleString()) < 10?'0'+now.getMinutes().toLocaleString():now.getMinutes().toLocaleString();
+		second.innerHTML = parseInt(now.getSeconds().toLocaleString()) < 10?'0'+now.getSeconds().toLocaleString():now.getSeconds().toLocaleString();
+	}
+
+</script>
+
+</head>
+
+<body>
+<script>
+	setInterval(clock, 1000);
+</script>
+<div class="timezone">
+	<div style="width:90%; margin:auto; border: solid 1px gray">
+		<span id="year" class="calendar"></span><span class="calendar">년</span>&nbsp;&nbsp;
+		<span id="month" class="calendar"></span><span class="calendar">월</span>&nbsp;&nbsp;
+		<span id="date" class="calendar"></span><span class="calendar">일</span>&nbsp;&nbsp;
+		<span id="day" class="calendar"></span>&nbsp;
+		<br><br>
+		<span id="hour" class="time"></span><span class="time">:</span>
+		<span id="minute" class="time"></span><span class="time">:</span>
+		<span id="second" class="time"></span>
+	</div>
+</div>
+</body>
+
