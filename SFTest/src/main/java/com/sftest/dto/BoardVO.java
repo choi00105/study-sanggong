@@ -1,61 +1,86 @@
-package com.sftest.dto;
+package com.SFTest.dto;
 
-	public class BoardVO {
-		
-		private int seqno;
-		private String writer;
-		private String userid;
-		private String password;
-		private String title;
-		private String regdate;
-		private int hitno;
-		private String content;
-		public int getSeqno() {
-			return seqno;
-		}
-		public void setSeqno(int seqno) {
-			this.seqno = seqno;
-		}
-		public String getWriter() {
-			return writer;
-		}
-		public void setWriter(String writer) {
-			this.writer = writer;
-		}
-		public String getUserid() {
-			return userid;
-		}
-		public void setUserid(String userid) {
-			this.userid = userid;
-		}
-		public String getPassword() {
-			return password;
-		}
-		public void setPassword(String password) {
-			this.password = password;
-		}
-		public String getTitle() {
-			return title;
-		}
-		public void setTitle(String title) {
-			this.title = title;
-		}
-		public String getRegdate() {
-			return regdate;
-		}
-		public void setRegdate(String regdate) {
-			this.regdate = regdate;
-		}
-		public int getHitno() {
-			return hitno;
-		}
-		public void setHitno(int hitno) {
-			this.hitno = hitno;
-		}
-		public String getContent() {
-			return content;
-		}
-		public void setContent(String content) {
-			this.content = content;
-		}
+public class BoardVO {
+	
+    private int seqno;
+    private int seq;
+    private String userid;
+    private String writer;
+    private String title;
+    private String regdate;
+    private String content;
+    private String org_filename;
+    private String stored_filename;
+    private long filesize; 
+    private int hitno;
+    
+	public int getSeqno() {
+		return seqno;
+	}
+	public void setSeqno(int seqno) {
+		this.seqno = seqno;
+	}	
+	public int getSeq() {
+		return seq;
+	}
+	public void setSeq(int seq) {
+		this.seq = seq;
+	}
+	public String getUserid() {
+		return userid;
+	}
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+	public String getWriter() {
+		return writer;
+	}
+	public void setWriter(String writer) {
+		this.writer = writer;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getRegdate() {
+		return regdate;
+	}
+	public void setRegdate(String regdate) {
+		this.regdate = regdate;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	public int getHitno() {
+		return hitno;
+	}
+	public void setHitno(int hitno) {
+		this.hitno = hitno;
+	}
+	public String getOrg_filename() {
+		return org_filename;
+	}
+	public void setOrg_filename(String org_filename) {
+		this.org_filename = org_filename;
+	}
+	public String getStored_filename() {
+		return stored_filename;
+	}
+	public void setStored_filename(String stored_filename) {
+		this.stored_filename = stored_filename;
+	}
+	public long getFilesize() {
+		return filesize;
+	}
+	public void setFilesize(long filesize) {
+		this.filesize = filesize;
+	}  
+	
+	
+	
 }

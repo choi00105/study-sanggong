@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.SFTest.mappers.User">
+
+<!-- 아이디 중복 체크. 카운터가 0이면 아이디 사용 가능, 1이면 기존 사용 중인 아이디 -->
+<select id="idCheck" parameterType="string" resultType="int">
+	select count(*) from tbl_user where userid = #{userid}
+</select>
+
+<!-- 로그인 정보 가져 오기 -->
+<select id="login" parameterType="string" resultType="com.SFTest.dto.UserVO">
+	select password,username from tbl_user where userid = #{userid}
+</select>
+
+
+<!-- 사용자 등록 -->
+<insert id="signup" parameterType="com.SFTest.dto.UserVO">
+	insert into tbl_user (userid,username,password,gender,hobby,job,description) values
+	 (#{userid},#{username},#{password},#{gender},#{hobby},#{job},#{description})
+</insert>
+	
+</mapper>  

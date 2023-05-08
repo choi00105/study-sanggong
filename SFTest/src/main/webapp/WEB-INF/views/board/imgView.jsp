@@ -1,12 +1,16 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>이미지 보기</title>
+</head>
+
+<body>
+
 <script>
 	const previewFile = () => {
+		
 		const preview = document.querySelector('img');
 		const file = document.querySelector('input[type=file]').files[0];
 		const reader = new FileReader();
@@ -16,13 +20,13 @@
 			console.log("preview.src = " + preview.src);
 		});
 		
-		if(file) reader.readAsDataURL(file); // 이미지를 URL 형태로 보내줌
+		if(file) reader.readAsDataURL(file);
+		
 	}
 </script>
-</head>
-<body>
 
-	<input type="file" onchange="previewFile()"><br>
-	<img src="" style="width: 400px; height: auto;">
+<input type="file" onchange="previewFile()"><br>
+<img src="" style="width: 400px; height:auto;">
+
 </body>
 </html>

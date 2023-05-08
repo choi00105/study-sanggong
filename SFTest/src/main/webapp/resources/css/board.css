@@ -190,6 +190,40 @@ a:active { color: red; }
   transition: 0.4s;
   display:inline;
 }
-.test {
-	background-color: red;
+
+.btn_cancel  {
+  position:relative;
+  left:20%;
+  transform: translateX(-50%);
+  margin-top: 20px;
+  margin-bottom: 10px;
+  width:40%;
+  height:40px;
+  background: pink;
+  background-position: left;
+  background-size: 200%;
+  color:white;
+  font-weight: bold;
+  border:none;
+  cursor:pointer;
+  transition: 0.4s;
+  display:inline;
+}
+
+.bottom_menu {
+	margin-top: 20px;
+}
+
+.bottom_menu > a:link, .bottom_menu > a:visited {
+	background-color: #FFA500;
+	color: maroon;
+	padding: 15px 25px;
+	text-align: center;
+	display: inline-block;
+	text-decoration: none;
+}
+
+.bottom_menu > a:hover, .bottom_menu > a:active {
+	background-color: #1E90FF;
+	text-decoration: none;
 }

@@ -11,7 +11,7 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="com.sftest.controller">
+	<logger name="com.SFTest.controller">
 		<level value="info" />
 	</logger>
 	

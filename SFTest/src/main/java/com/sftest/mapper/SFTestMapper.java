@@ -1,4 +1,4 @@
-package com.sftest.mapper;
+package com.SFTest.mapper;
 
 import java.util.List;
 
@@ -9,8 +9,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.sftest.dto.BoardVO;
-import com.sftest.dto.UserVO;
+import com.SFTest.dto.BoardVO;
+import com.SFTest.dto.UserVO;
 
 @Mapper
 public interface SFTestMapper {
@@ -20,11 +20,11 @@ public interface SFTestMapper {
 	public List<BoardVO> list();
 
 	//게시물 등록
-	@Insert("insert into tbl_board (userid,writer,title,content) values ('${board.userid}','${board.writer}','${board.title}','${board.content}')")
+	@Insert("insert into tbl_board (userid,writer,title,content,org_filename,stored_filename,filesize) values ('${board.userid}','${board.writer}','${board.title}','${board.content}','${board.org_filename}','${board.stored_filename}',${board.filesize})")
 	public void write(@Param("board") BoardVO board);
 	
 	//게시물 상세 보기
-	@Select("select seqno,writer,title,to_char(regdate,'YYYY-MM-DD HH24:MI:SS') as regdate,content from tbl_board where seqno = ${seqno}")
+	@Select("select seqno,writer,userid,title,to_char(regdate,'YYYY-MM-DD HH24:MI:SS') as regdate,content,org_filename,stored_filename,filesize from tbl_board where seqno = ${seqno}")
 	public BoardVO view(@Param("seqno") int seqno);
 	
 	//조회수 업데이트
@@ -43,8 +43,12 @@ public interface SFTestMapper {
 	@Select("select count(*) from tbl_user where userid = '${userid}'")
 	public int idCheck(@Param("userid") String userid);
 	
+	//로그인 정보 가져 오기
+	@Select("select password,username from tbl_user where userid = '${userid}'")
+	public UserVO login(@Param("userid") String userid);
+	
 	//사용자 등록
-	@Insert("insert into tbl_user (userid, username, password, gender, hobby, job,description) values ('${user.userid}','${user.username}','${user.password}','${user.gender}','${user.hobby}','${user.job}','${user.description}')")
+	@Insert("insert into tbl_user (userid,username,password,gender,hobby,job,description) values ('${user.userid}','${user.username}','${user.password}','${user.gender}','${user.hobby}','${user.job}','${user.description}')")
 	public void signup(@Param("user") UserVO user);
 
 }
