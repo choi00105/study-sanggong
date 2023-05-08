@@ -15,8 +15,8 @@
 	}
 	
 	<!-- 댓글 처리 -->
-	function replyRegister() { //form 데이터 전송 --> 반드시 serialize()를 해야 한다.
-		
+	const replyRegister = async () => { //form 데이터 전송 --> 반드시 serialize()를 해야 한다.
+		/*
 		if($("#replycontent").val() == "") {alert("댓글을 입력하세요."); $("#replycontent").focus(); return false;}
 		
 		var queryString = $("form[name=replyForm]").serialize();
@@ -32,21 +32,56 @@
 	              	    return false;
 			}
 		}); //End of ajax
-		$("#replycontent").val("");	
+		$("#replycontent").val("");
+		*/
+		
+		// jquery를 바닐라 js로
+		
+		const replycontent = document.querySelector('#replycontent');
+		if(replycontent.value =='') {alert("댓글을 입력 하세요.").replycontent.focus(); return false;}
+		
+		const data = {
+				replywriter: replywriter.value,
+				replycontent: replycontent.value,
+				userid: userid.value,
+				seqno: seqno.value
+		}
+		
+		await fetch('/board/reply?option=I', {
+			method: 'POST',
+			headers: {"content-type":"application/json"},
+			body: JSON.stringify(data)
+		}).then((response) => response.json())
+		.then((data) => replyList(data))
+		.catch((error) => {
+			console.log("error = "+error);
+			alert("시스템 장애로 댓글 등록이 실패했습니다.");
+		});
+
+	replycontent.value ='';
 	}
 
-	function replyList(data){
+	const replyList = (data) => {
 		
 		var session_userid = '${userid}';
 		const jsonInfo = data;
 		
+		let replyList = document.querySelector('#replyList');
+		replyList.innerHTML = '';
+		
 		var result = "";
 		for(const i in jsonInfo){
 			
-			result += "<div id='replyListView'>";
-			result += "<div id = '" + jsonInfo[i].replyseqno + "' style='font-size: 0.8em'>";
-			//<div id = '120' style='font-size: 0.8em'>...</div>
-			result += "작성자 : " + jsonInfo[i].replywriter;
+			let elm = document.createElement('div'); //<div></div> 하나가 만들어짐
+			elm.setAttribute("id", "s" + data[i].replyseqno); // <div id="s">
+			elm.setAttribute("style", "font-size: 0.8em"); // <div style="font-size: 0.8em">
+			
+			let result = "";
+			
+			//result += "<div id='replyListView'>";
+			//result += "<div id = '" + jsonInfo[i].replyseqno + "' style='font-size: 0.8em'>"; //<div id = '120' style='font-size: 0.8em'>...</div>
+			
+			result += "작성자 : " + jsonInfo[i].replywriter + "\t";
 							
 			if(jsonInfo[i].userid == session_userid) {
 				result += "[<a href=" + "'javascript:replyModify(" + jsonInfo[i].replyseqno + ")' style='cursor:pointer;'>수정</a> | " ;
@@ -55,17 +90,23 @@
 			
 			result += "&nbsp;&nbsp;" + jsonInfo[i].replyregdate
 			result += "<div style='width:90%; height: auto; border-top: 1px solid gray; overflow: auto;'>";
-			result += "<pre class='" + jsonInfo[i].replyseqno + "'>" + jsonInfo[i].replycontent + "</pre></div>";
-			//<pre class='2'>안녕</pre></div>
-			result += "</div>";
-			result += "</div><br>";
+			result += "<pre id='c" + jsonInfo[i].replyseqno + "'>" + jsonInfo[i].replycontent + "</pre></div>";
+			
+			//result += "</div>";
+			//result += "</div><br>";
+			result += "<br>";
+		
+			
+			elm.innerHTML = result;
+			
+			replyList.appendChild(elm);
 		}
-		$("#replyListView").remove();
-		$("#replyList").html(result); 
+		//$("#replyListView").remove();
+		//$("#replyList").html(result); 
 	}
 
-	function startupPage(){
-		
+	const startupPage = async () => {
+		/*
 		var queryString = { "seqno": "${view.seqno}" };
 		$.ajax({
 			url : "reply?option=L",
@@ -78,9 +119,25 @@
 	              	    	return false;
 					}
 		}); //End od ajax
+		*/
+		const data = {seqno: "${view.seqno}"};
+		
+		await fetch('/board/reply?option=L',{
+			method: 'POST',
+			headers: {
+				"content-type": "application/json"
+			},
+			body: JSON.stringify(data)
+		}).then((response) => response.json())
+			.then((data) => replyList(data))
+			.catch((error) => {
+				console.log("error = "+error);
+				alert("시스템 장애로 페이지 로딩이 실패했습니다.");
+			});
 	}
 
-	function replyDelete(replyseqno) { 
+	const replyDelete = async (replyseqno) => { 
+		/*
 		var rseqno = replyseqno
 		if(confirm("정말로 삭제하시겠습니까?") == true) {
 			var queryString = { "replyseqno": replyseqno, "seqno":${view.seqno} };
@@ -96,25 +153,50 @@
 				}
 			}); //End od ajax
 		}
+		*/
+		if(confirm("정말로 삭제하시겠습니까?") == true) {
+			const data = {replyseqno: replyseqno,
+							seqno: ${view.seqno}};
+			
+			await fetch('/board/reply?option=D',{
+				method: 'POST',
+				headers: {
+					"content-type": "application/json"
+				},
+				body: JSON.stringify(data)
+			}).then((response) => response.json())
+				.then((data) => replyList(data))
+				.catch((error) => {
+					console.log("error = "+error);
+					alert("시스템 장애로 삭제가 실패했습니다.");
+				});
+		}
 	}
 
-	function replyModify(replyseqno) {
+	const replyModify = (replyseqno) => {
 
-		var replyContent = $("." + replyseqno).html();
+		//var replyContent = $("." + replyseqno).html();
+		const modifyReplyContent = document.querySelector('#c' + replyseqno);
 		
-		var strReplyList = "<form id='formModify' name='formModify' method='POST'>"
-						+ "작성자 : ${session_userid}&nbsp;"
+		var strReplyList = "작성자 : ${session_userid}&nbsp;"
 						+ "<input type='button' id='btn_replyModify' value='수정'>"
 						+ "<input type='button' id='btn_replyModifyCancel' value='취소'>"
 						+ "<input type='hidden' name='replyseqno' value='" + replyseqno + "'>"
 						+ "<input type='hidden' name='seqno' value='${view.seqno}'>"
 						+ "<input type='hidden' id='writer' name='replywriter' value='${session_username}'>"
 						+ "<input type='hidden' id='uerid' name='userid' value='${session_userid}'><br>"
-						+ "<textarea id='replycontent' name='replycontent' cols='80' rows='5' maxlength='150' placeholder='글자수:150자 이내'>" + replyContent + "</textarea><br>"
-						+ "</form>";
-		$('#' + replyseqno).after(strReplyList);				
-		$('#' + replyseqno).remove();
-
+						+ "<textarea id='modify_replycontent' name='replycontent' cols='80' rows='5' maxlength='150' placeholder='글자수:150자 이내'>" + modifyReplyContent.innerHTML + "</textarea><br>";
+		
+		let elm = document.createElement('div');
+		elm.innerHTML = strReplyList;
+		
+		let parentDiv = document.querySelector('#s' + replyseqno).parentNode;
+		parentDiv.insertBefore(elm, document.querySelector('#s' + replyseqno));
+		document.querySelector('#s' + replyseqno).style.display = 'none';
+						
+		//$('#' + replyseqno).after(strReplyList);				
+		//$('#' + replyseqno).remove();
+		/*
 		$("#btn_replyModify").on("click", function(){
 			var queryString = $("form[name=formModify]").serialize();
 			$.ajax({
@@ -133,11 +215,49 @@
 		 $("#btn_replyModifyCancel").on("click", function(){
 			 if(confirm("정말로 취소하시겠습니까?") == true  ) { $("#replyListView").remove(); startupPage(); }
 		 });	 
+		*/
+		
+		const btnReplyModify = document.querySelector('#btn_replyModify');
+		const btnReplyModifyCancel = document.querySelector('#btn_replyModifyCancel');
+		
+		btnReplyModify.addEventListener('click', async ()=> {
+			
+			const data = {
+				replyseqno: replyseqno,
+				replycontent: modify_replycontent.value
+			};
+			
+			await fetch('/board/reply?option=U',{
+				
+				method: 'POST',
+				headers: {
+					"content-type": "application/json"
+				},
+				body: JSON.stringify(data)
+			}).catch((error) => {
+				console.log("error = " + error);
+				alert("서버 장애로 댓글 수정이 실패했습니다.");
+			});
+			
+			document.querySelector('#replyList').innerHTML = '';
+			startupPage();				
+			
+		});
+		
+		btnReplyModifyCancel.addEventListener('click',()=> {
+			if(confirm("정말로 취소하시겠습니까?") == true){
+				document.querySelector('#replyList').innerHTML = '';
+				startupPage();	
+			}
+		});
 		
 	}
 		
-	function replyCancel() { 
-			if(confirm("정말로 취소 하시겠습니까?") == true) { $("#replyContent").val(""); $("#replyContent").focus(); }
+	const replyCancel = () => { 
+		if(confirm("정말로 취소 하시겠습니까?") == true) { 
+			replycontent.value = ''; 
+			replycontent.focus(); 
+		}
 	}
 
 	
@@ -218,11 +338,10 @@
 	    	<input type="hidden" id="userid" name="userid" value="${userid}">
 		</form>
 		<input type="button" id="btn_reply" value="댓글등록" onclick="replyRegister()">
+		<input type="button" id="btn_cancel" value="취소" onclick="replyCancel()">
 		<hr>
 		
-		<div id="replyList" style="width:100%; height:600px; overflow:auto;">
-			<div id="replyListView"></div> 
-		</div><!-- replyList End  -->		
+		<div id="replyList" style="width:100%; height:600px; overflow:auto;"></div>	
 	</div>
 	
 </div>

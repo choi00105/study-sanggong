@@ -7,8 +7,7 @@
 <link rel="stylesheet" href="/resources/css/board.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
-function register(){
-	
+const register = async () => {
 	
 	//유효성 검사
 	if($("#userid").val() == '') { alert("아이디를 입력하세요."); $("#userid").focus();  return false; }
@@ -23,14 +22,52 @@ function register(){
 	
 	// 암호유효성 검사
 	//자바스크립트의 정규식(Regular Expression)
-	var num = Pass.search(/[0-9]/g); // 0-9까지의 숫자가 들어 있는지 검색. 검색이 안되면 -1을 리턴
- 	var eng = Pass.search(/[a-z]/ig); //i : 알파벳 대소문자 구분 없이... 
- 	var spe = Pass.search(/[`~!@@#$%^&*|₩₩₩'₩";:₩/?]/gi);	//특수문자가 포함되어 있는가 검색
-	if(Pass.length < 8 || Pass.length > 20) { alert("암호는 8자리 ~ 20자리 이내로 입력해주세요."); return false; }
-	else if(Pass.search(/\s/) != -1){ alert("암호는 공백 없이 입력해주세요."); return false; }
-	else if(num < 0 || eng < 0 || spe < 0 ){ alert("암호는 영문,숫자,특수문자를 혼합하여 입력해주세요."); return false; }
+	//var num = Pass.search(/[0-9]/g); // 0-9까지의 숫자가 들어 있는지 검색. 검색이 안되면 -1을 리턴
+ 	//var eng = Pass.search(/[a-z]/ig); //i : 알파벳 대소문자 구분 없이... 
+ 	//var spe = Pass.search(/[`~!@@#$%^&*|₩₩₩'₩";:₩/?]/gi);	//특수문자가 포함되어 있는가 검색
+	//if(Pass.length < 8 || Pass.length > 20) { alert("암호는 8자리 ~ 20자리 이내로 입력해주세요."); return false; }
+	//else if(Pass.search(/\s/) != -1){ alert("암호는 공백 없이 입력해주세요."); return false; }
+	//else if(num < 0 || eng < 0 || spe < 0 ){ alert("암호는 영문,숫자,특수문자를 혼합하여 입력해주세요."); return false; }
 
-	$('#RegistryForm').attr('action','/user/signup').submit();
+	// $('#RegistryForm').attr('action','/user/signup').submit();
+	
+	// 새로 데이터 받는 방법 ( 프론트 단에서 어떻게 주고 받는지 ) 
+	const gender = document.querySelector('input[name = gender]:checked');
+	const hobby = document.querySelectorAll('input[name = hobbies]:checked');
+	let hobbyArray = [];
+	for(let i = 0; i< hobby.length; i++)
+		hobbyArray.push(hobby[i].value);
+	
+	const job = document.querySelector('select[name = job] option:checked');
+	const description = document.querySelector('textarea[name = description]');
+	
+	// 자바스크립트 객체 만들기
+	const data = {
+		userid: userid.value,
+		username: username.value,
+		password: password.value,
+		gender: gender.value,
+		hobby: hobbyArray.toString(),
+		job: job.value,
+		description: description.value
+			
+	}
+	await fetch('', { // ('경로', 보낼 데이터)
+		headers: {
+			"content-type": "application/json"
+		},
+		method: 'POST',
+		body: JSON.stringify(data)
+	}).then((response) => response.json())
+	.then((data) => {
+		if(data.status === 'good'){
+			alert(data.username + "님, 회원 등록 완료");
+			document.location.href="/board/list?page=1";
+		} else {
+			alert("서버 장애로 회원 가입에 실패 했습니다.");
+		}
+	});
+	
 }
 
 function selectAll(checkElement){

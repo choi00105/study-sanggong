@@ -73,20 +73,17 @@ public class UserController {
 	public void getSignup() throws Exception { }
 	
 	//회원 가입
+	@ResponseBody
 	@PostMapping("/user/signup")
-	public String postSignup(UserVO user,@RequestParam("hobbies") List<String> hobbies) throws Exception {
+	public String postSignup(@RequestBody UserVO user) throws Exception {
 	
-		String hobby = "";
-		for(String h:hobbies) {
-			hobby += h + ","; 
-		}
-		
-		user.setHobby(hobby);
-		
 		user.setPassword(pwdEncoder.encode(user.getPassword()));
 		
 		mapper.signup(user);		
-		return "redirect:/board/list";
+		//return "{\"username\":" + user.getUsername() + "\",\"status\":\"good\"}";
+		return "{\"username\":\"" + user.getUsername() + "\",\"status\":\"good\"}";
+
+		// json 포맷으로 문자열 만든 것 {username: "김철수", status: "good"}
 		
 	}
 	

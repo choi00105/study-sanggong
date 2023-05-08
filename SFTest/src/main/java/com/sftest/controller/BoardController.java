@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -182,7 +183,7 @@ public class BoardController {
 	//댓글 처리
 	@ResponseBody
 	@PostMapping("/board/reply")
-	public List<ReplyVO> postReply(ReplyVO reply,@RequestParam("option") String option)throws Exception{
+	public List<ReplyVO> postReply(@RequestBody ReplyVO reply,@RequestParam("option") String option)throws Exception{
 		
 		switch(option) {
 		

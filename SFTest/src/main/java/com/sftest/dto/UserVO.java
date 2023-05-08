@@ -1,7 +1,5 @@
 package com.SFTest.dto;
 
-import java.util.List;
-
 public class UserVO {
 	
 	private String userid;
