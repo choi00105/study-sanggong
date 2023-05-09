@@ -1,5 +1,6 @@
 package com.SFTest.controller;
 
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -80,9 +81,8 @@ public class UserController {
 		user.setPassword(pwdEncoder.encode(user.getPassword()));
 		
 		mapper.signup(user);		
-		//return "{\"username\":" + user.getUsername() + "\",\"status\":\"good\"}";
-		return "{\"username\":\"" + user.getUsername() + "\",\"status\":\"good\"}";
-
+		
+		return "{ \"username\": \"" + URLEncoder.encode(user.getUsername()) + "\", \"status\": \"good\" }";
 		// json 포맷으로 문자열 만든 것 {username: "김철수", status: "good"}
 		
 	}

@@ -24,15 +24,26 @@ var username;
 		myLikeCheck = '${myLikeCheck}'; 
 		myDislikeCheck = '${myDislikeCheck}'; 
 		username = '${username}';
-		$("#like").html(likeCnt);
-		$("#dislike").html(dislikeCnt);
-		
+		//$("#like").html(likeCnt);
+		//$("#dislike").html(dislikeCnt);
+		document.getElementById("like").innerHTML = likeCnt;
+		document.getElementById("dislike").innerHTML = dislikeCnt;
+
+		/*
 		if(myLikeCheck == "Y") $(".likeClick").css("background-color", "#00B9FF"); 
 		    else if(myDislikeCheck == "Y") $(".dislikeClick").css("background-color", "#00B9FF"); 
 		
 		if(myLikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 좋아요입니다."); 
 		        else if(myDislikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 싫어요입니다."); 
 		        else if(myLikeCheck == "N" && myDislikeCheck == "N") $("#myChoice").html(username + "님은 아직 선택을 안 했네요"); 
+		*/
+		if(myLikeCheck == "Y") document.querySelector(".likeClick").style.backgroundColor = "#00B9FF";
+	    	else if(myDislikeCheck == "Y") document.querySelector(".dislikeClick").style.backgroundColor = "#00B9FF";
+	
+		if(myLikeCheck == "Y") document.getElementById("myChoice").innerHTML = username + "님의 선택은 좋아요입니다.";
+	        else if(myDislikeCheck == "Y") document.getElementById("myChoice").innerHTML = username + "님의 선택은 싫어요입니다.";
+	        else if(myLikeCheck == "N" && myDislikeCheck == "N") document.getElementById("myChoice").innerHTML = username + "님은 아직 선택을 안 했네요";
+		startupPage();
 	}
 
 	const startupPage = async () => {
@@ -50,6 +61,7 @@ var username;
 					}
 		}); //End od ajax
 		*/
+		// 댓글 불러오기
 		const data = {seqno: "${view.seqno}"};
 		
 		await fetch('/board/reply?option=L',{
@@ -183,27 +195,6 @@ var username;
 	
 	<!-- 댓글 처리 -->
 	const replyRegister = async () => { //form 데이터 전송 --> 반드시 serialize()를 해야 한다.
-		/*
-		if($("#replycontent").val() == "") {alert("댓글을 입력하세요."); $("#replycontent").focus(); return false;}
-		
-		var queryString = $("form[name=replyForm]").serialize();
-		//serialize --> 데이터를 스트림으로 보내기 위한 타입으로 바꾸는 함수.
-		$.ajax({
-			url : "reply?option=I",
-			type : "post",
-			datatype : "json",
-			data : queryString,
-			success : replyList,
-			error : function(data) {
-						alert("서버오류 문제로 댓글 등록이 실패 했습니다. 잠시 후 다시 시도해주시기 바랍니다.");
-	              	    return false;
-			}
-		}); //End of ajax
-		$("#replycontent").val("");
-		*/
-		
-		// jquery를 바닐라 js로
-		
 		const replycontent = document.querySelector('#replycontent');
 		if(replycontent.value =='') {alert("댓글을 입력 하세요.").replycontent.focus(); return false;}
 		
@@ -228,8 +219,7 @@ var username;
 	replycontent.value ='';
 	}
 
-	const replyList = (data) => {
-		
+	const replyList = (data) => {		
 		var session_userid = '${userid}';
 		const jsonInfo = data;
 		
