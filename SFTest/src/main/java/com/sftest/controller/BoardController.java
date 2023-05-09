@@ -52,6 +52,7 @@ public class BoardController {
 	@GetMapping("/board/list")
 	public void getList(@RequestParam("page") int pageNum, @RequestParam(name="keyword",defaultValue="",required=false) String keyword, Model model) throws Exception{
 		//model.addAttribute("list",mapper.list());
+		System.out.println("===GET /board/list");
 		int postNum = 10; //한 화면에 보여지는 게시물 행의 갯수
 		int pageListCount = 10; //화면 하단에 보여지는 페이지리스트 내의 페이지 갯수
 		int startPoint = (pageNum-1)*postNum;
@@ -72,7 +73,7 @@ public class BoardController {
 	@PostMapping("/board/write")
 	public String postWrite(BoardVO board,
 			@RequestParam("fileUpload") MultipartFile mpr) throws Exception{
-		
+		System.out.println("===POST /board/write --> redirect:/board/list?page=1");
 		String path = "c:\\Repository\\test\\"; 
 		String org_filename = "";
 		long filesize = 0L;
@@ -102,7 +103,7 @@ public class BoardController {
 	public void getView(@RequestParam("seqno") int seqno, @RequestParam("page") int pageNum,
 			@RequestParam(name="keyword",defaultValue="",required=false) String keyword,
 			Model model,HttpSession session) throws Exception {
-		
+		System.out.println("===GET /board/view");
 		String SessionUserid = (String)session.getAttribute("userid");
 		BoardVO view = service.view(seqno);
 		
@@ -140,7 +141,7 @@ public class BoardController {
 	@ResponseBody
 	@PostMapping(value = "/board/likeCheck")
 	public Map<String, Object> postLikeCheck(@RequestBody Map<String, Object> likeCheckData) throws Exception {
-		System.out.println("=== /board/likeCheck");
+		System.out.println("===POST /board/likeCheck");
 		int seqno = (int)likeCheckData.get("seqno");
 		String userid = (String)likeCheckData.get("userid");
 		int checkCnt = (int)likeCheckData.get("checkCnt");
@@ -192,7 +193,7 @@ public class BoardController {
 	public void getModify(@RequestParam("seqno") int seqno, @RequestParam("page") int pageNum, Model model,
 			@RequestParam(name="keyword",defaultValue="",required=false) String keyword
 			) throws Exception{ 
-		
+		System.out.println("===GET /board/modify");
 		//model.addAttribute("view", mapper.view(seqno));
 		model.addAttribute("view", service.view(seqno));
 		model.addAttribute("page", pageNum);
@@ -205,7 +206,7 @@ public class BoardController {
 	public String postModify(BoardVO board,@RequestParam("page") int pageNum,
 			@RequestParam(name="keyword",defaultValue="",required=false) String keyword
 			) throws Exception {
-		
+		System.out.println("===POST /board/modify --> redirect:/board/view?seqno=번호&page=페이지번호&keyword=키워드");
 		//mapper.modify(board);
 		
 		service.modify(board);
@@ -216,7 +217,7 @@ public class BoardController {
 	//게시물 삭제
 	@GetMapping("/board/delete")
 	public String getDelete(@RequestParam("seqno") int seqno) throws Exception {
-		
+		System.out.println("===GET  /board/delete --> redirect:/board/list?page=1");
 		/*BoardVO board = mapper.view(seqno);
 		if(!board.getStored_filename().isEmpty()) {
 			File file = new File("c:\\Repository\\test\\" + board.getStored_filename());
@@ -231,7 +232,7 @@ public class BoardController {
 	//파일 다운로드
 	@GetMapping("/board/filedownload")
 	public void filedownload(@RequestParam("seqno") int seqno, HttpServletResponse rs) throws Exception {
-		
+		System.out.println("===GET  /board/filedownload");
 		String path = "c:\\Repository\\test\\";
 		
 		//BoardVO board = mapper.view(seqno);
@@ -254,7 +255,7 @@ public class BoardController {
 	@ResponseBody
 	@PostMapping("/board/reply")
 	public List<ReplyVO> postReply(@RequestBody ReplyVO reply,@RequestParam("option") String option)throws Exception{
-		
+		System.out.println("===POST  /board/reply");
 		switch(option) {
 		
 		case "I" : service.replyRegistry(reply); //댓글 등록

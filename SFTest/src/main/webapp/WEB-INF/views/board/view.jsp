@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -9,16 +10,15 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 
-<!-- 좋아요, 싫어요 제이쿼리 처리 함수 시작 -->
-	
-	var likeCnt; 
-	var dislikeCnt; 
-	var myLikeCheck; 
-	var myDislikeCheck; 
-	var username;
-	
-	// 게시물 상세 보기 화면 로딩시 좋아요/실어요 값 사져와서 화면 구성해 주는 부분
-	$(document).ready(function(){
+//화면 로딩시 좋아요 싫어요 초기 값 및 상태 보여주기
+var likeCnt; 
+var dislikeCnt; 
+var myLikeCheck; 
+var myDislikeCheck; 
+var username;
+
+	window.onload = () => {	
+		// 게시물 상세 보기 화면 로딩시 좋아요/실어요 값 가져와서 화면 구성해 주는 부분
 		likeCnt = ${view.likecnt}; 
 		dislikeCnt = ${view.dislikecnt}; 
 		myLikeCheck = '${myLikeCheck}'; 
@@ -33,72 +33,111 @@
 		if(myLikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 좋아요입니다."); 
 		        else if(myDislikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 싫어요입니다."); 
 		        else if(myLikeCheck == "N" && myDislikeCheck == "N") $("#myChoice").html(username + "님은 아직 선택을 안 했네요"); 
-	});
-	
+	}
+
+	const startupPage = async () => {
+		/*
+		var queryString = { "seqno": "${view.seqno}" };
+		$.ajax({
+			url : "reply?option=L",
+			type : "post",
+			datatype : "json",
+			data : queryString,
+			success : replyList,
+			error : function(data) {
+							alert("서버 오류로 댓글 불러 오기가 실패했습니다.");
+	              	    	return false;
+					}
+		}); //End od ajax
+		*/
+		const data = {seqno: "${view.seqno}"};
+		
+		await fetch('/board/reply?option=L',{
+			method: 'POST',
+			headers: {
+				"content-type": "application/json"
+			},
+			body: JSON.stringify(data)
+		}).then((response) => response.json())
+			.then((data) => replyList(data))
+			.catch((error) => {
+				console.log("error = "+error);
+				alert("시스템 장애로 페이지 로딩이 실패했습니다.");
+			});
+	}
+<!-- 좋아요, 싫어요 제이쿼리 처리 함수 시작 -->
 	function likeView(){ 
 	    
+	    let likeClick = document.querySelector(".likeClick");
+	    let dislikeClick =  document.querySelector(".dislikeClick");
+	    let myChoice = document.querySelector("#myChoice");
 	    if(myLikeCheck == "Y" && myDislikeCheck =="N") {
 	        alert("좋아요를 취소합니다."); 
 	        var checkCnt = 1;  //likeCnt --; --> 6개의 조건 중 하나
 	        myLikeCheck = "N";
 	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt); 
-	        $(".likeClick").css("background-color", "#d2d2d2"); 
+	        //$(".likeClick").css("background-color", "#d2d2d2"); 
+	        likeClick.style.backgroundColor = "#d2d2d2"; 
 	    }else if(myLikeCheck == "N" && myDislikeCheck =="Y") {
 	        alert("싫어요가 취소되고 좋아요가 등록됩니다.");
 	        var checkCnt = 2; // likeCnt ++ , dislikeCnt --
 	        myLikeCheck = "Y";
 	        myDislikeCheck = "N";
 	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt);  
-	        $(".likeClick").css("background-color", "#00B9FF"); 
-	        $(".dislikeClick").css("background-color", "#d2d2d2");
+	        //$(".likeClick").css("background-color", "#00B9FF"); 
+	        likeClick.style.backgroundColor = "#00B9FF"; 
+	        //$(".dislikeClick").css("background-color", "#d2d2d2");
+	        dislikeClick.style.backgroundColor = "#d2d2d2"; 
 	    } else if(myLikeCheck == "N" && myDislikeCheck =="N") {
 	        alert("좋아요를 선택 했습니다.")
 	    	var checkCnt = 3; //likeCnt ++
 	        myLikeCheck = "Y";
 	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt);
-	        $(".likeClick").css("background-color", "#00B9FF"); 
+	        //$(".likeClick").css("background-color", "#00B9FF");
+	        likeClick.style.backgroundColor = "#00B9FF";
 	    }
-	    if(myLikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 좋아요입니다."); 
-	        else if(myDislikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 싫어요입니다."); 
-	        else if(myLikeCheck == "N" && myDislikeCheck == "N") $("#myChoice").html(username + "님은 아직 선택을 안 했네요"); 
+	    if(myLikeCheck == "Y") myChoice.html=username + "님의 선택은 좋아요입니다."; 
+	        else if(myDislikeCheck == "Y") myChoice.html=username + "님의 선택은 싫어요입니다."; 
+	        else if(myLikeCheck == "N" && myDislikeCheck == "N") myChoice.html=username + "님은 아직 선택을 안 했네요"; 
 	}
 	
 	function disLikeView() {
-	    
-	    if(myDislikeCheck == "Y" && myLikeCheck =="N") {
-	        alert("싫어요를 취소합니다."); 
-	        var checkCnt = 4; // dislikeCnt --
-	        myDislikeCheck = "N";
-	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt);
-	        $(".dislikeClick").css("background-color", "#d2d2d2"); 
-	    } else if(myDislikeCheck = "N" && myLikeCheck =="Y") {
-	        alert("좋아요가 취소되고 싫어요가 등록됩니다.");
-	        var checkCnt = 5; //likeCnt -- , dislikeCnt ++            
-	        myLikeCheck = "N";            
-	        myDislikeCheck = "Y";
-	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt);
-	        $(".likeClick").css("background-color", "#d2d2d2"); 
-	        $(".dislikeClick").css("background-color", "#00B9FF"); 
-	    } else if(myDislikeCheck = "N" && myLikeCheck =="N") {
-	        alert("싫어요를 선택했습니다.");
-	    	var checkCnt = 6; //dislikeCnt ++
-	        myDislikeCheck = "Y";
-	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt);
-	        $(".dislikeClick").css("background-color", "#00B9FF"); 
-	    }
-	    if(myLikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 좋아요입니다."); 
-	        else if(myDislikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 싫어요입니다."); 
-	        else if(myLikeCheck == "N" && myDislikeCheck == "N") $("#myChoice").html(username + "님은 아직 선택을 안 했네요"); 
+		if (myDislikeCheck === "Y" && myLikeCheck === "N") {
+			alert("싫어요를 취소합니다.");
+			var checkCnt = 4; // dislikeCnt --
+			myDislikeCheck = "N";
+			sendDataToServer(myLikeCheck, myDislikeCheck, checkCnt);
+			document.querySelector(".dislikeClick").style.backgroundColor = "#d2d2d2";
+		} else if (myDislikeCheck === "N" && myLikeCheck === "Y") {
+			alert("좋아요가 취소되고 싫어요가 등록됩니다.");
+			var checkCnt = 5; //likeCnt -- , dislikeCnt ++
+			myLikeCheck = "N";
+			myDislikeCheck = "Y";
+			sendDataToServer(myLikeCheck, myDislikeCheck, checkCnt);
+			document.querySelector(".likeClick").style.backgroundColor = "#d2d2d2";
+			document.querySelector(".dislikeClick").style.backgroundColor = "#00B9FF";
+		} else if (myDislikeCheck === "N" && myLikeCheck === "N") {
+			alert("싫어요를 선택했습니다.");
+			var checkCnt = 6; //dislikeCnt ++
+			myDislikeCheck = "Y";
+			sendDataToServer(myLikeCheck, myDislikeCheck, checkCnt);
+			document.querySelector(".dislikeClick").style.backgroundColor = "#00B9FF";
+		}
+		if (myLikeCheck === "Y") document.querySelector("#myChoice").innerHTML = username + "님의 선택은 좋아요입니다.";
+		else if (myDislikeCheck === "Y") document.querySelector("#myChoice").innerHTML = username + "님의 선택은 싫어요입니다.";
+		else if (myLikeCheck === "N" && myDislikeCheck === "N") document.querySelector("#myChoice").innerHTML = username + "님은 아직 선택을 안 했네요";
+		
 	}
 	
-	function sendDataToServer(myLike, myDislike, checkCount) {
+	const sendDataToServer = async (myLike, myDislike, checkCount) => {
 	
 	    var myLikeCheck = myLike;
 	    var myDislikeCheck = myDislike;
 	    var checkCnt = checkCount;
-	    
+	    /*
 	    var queryString = {"seqno":${view.seqno},"userid":"${userid}",
 	    		"mylikecheck":myLikeCheck,"mydislikecheck":myDislikeCheck,"checkCnt":checkCnt};
+	    
 	    $.ajax({ //JSON --> MAP 타입일 경우 contentType를 반드시 입력...
 	        url: "/board/likeCheck",
 	        method: "POST",
@@ -114,6 +153,24 @@
 	  	    	return false;
 			}
 	    }); //End of ajax
+	    */	    
+	    const data = {"seqno":${view.seqno},"userid":"${userid}",
+	    	    "mylikecheck":myLikeCheck,"mydislikecheck":myDislikeCheck,"checkCnt":checkCnt};
+	    	await fetch('/board/likeCheck', {
+	    	    method: 'POST',
+	    	    headers: {
+	    	        "content-type": "application/json"
+	    	    },
+	    	    body: JSON.stringify(data)
+	    	}).then((response) => response.json())
+	    	.then((map) => {
+	    	    document.getElementById("like").innerHTML = map["likeCnt"];
+	    	    document.getElementById("dislike").innerHTML = map["dislikeCnt"];
+	    	})
+	    	.catch((error) => {
+	    	    alert("서버오류 문제로 좋아요/싫어요 등록이 실패 했습니다. 잠시 후 다시 시도해주시기 바랍니다.");
+	    	});
+
 	
 	}
 <!-- 좋아요, 싫어요 제이쿼리 처리 함수 끝-->
@@ -214,38 +271,7 @@
 		//$("#replyListView").remove();
 		//$("#replyList").html(result); 
 	}
-
-	const startupPage = async () => {
-		/*
-		var queryString = { "seqno": "${view.seqno}" };
-		$.ajax({
-			url : "reply?option=L",
-			type : "post",
-			datatype : "json",
-			data : queryString,
-			success : replyList,
-			error : function(data) {
-							alert("서버 오류로 댓글 불러 오기가 실패했습니다.");
-	              	    	return false;
-					}
-		}); //End od ajax
-		*/
-		const data = {seqno: "${view.seqno}"};
-		
-		await fetch('/board/reply?option=L',{
-			method: 'POST',
-			headers: {
-				"content-type": "application/json"
-			},
-			body: JSON.stringify(data)
-		}).then((response) => response.json())
-			.then((data) => replyList(data))
-			.catch((error) => {
-				console.log("error = "+error);
-				alert("시스템 장애로 페이지 로딩이 실패했습니다.");
-			});
-	}
-
+	
 	const replyDelete = async (replyseqno) => { 
 		/*
 		var rseqno = replyseqno
@@ -409,7 +435,7 @@
 
 </style>
 </head>
-<body onload="startupPage()">
+<body>
 
 <%
 
