@@ -29,7 +29,7 @@
 <!-- 게시물 상세 보기 -->
 <select id="view" parameterType="int" resultType="com.SFTest.dto.BoardVO">
 	select seqno,writer,userid,title,to_char(regdate,'YYYY-MM-DD HH24:MI:SS') as regdate,
-		content,org_filename,stored_filename,filesize from tbl_board where seqno = #{seqno}
+		content,org_filename,stored_filename,filesize, likecnt, dislikecnt from tbl_board where seqno = #{seqno}
 </select>
 
 <!-- 게시물 이전 보기 -->
@@ -65,6 +65,28 @@
 <delete id="delete" parameterType="int">
 	delete from tbl_board where seqno=#{seqno}
 </delete>
+
+<!-- 좋아요/싫어요 확인 내용 가져 오기-->
+<select id="likeCheckView" parameterType="HashMap" resultType="com.SFTest.dto.LikeVO">
+	select mylikecheck, mydislikecheck from tbl_like where seqno = #{seqno} and userid = #{userid}
+</select>
+
+<!-- 좋아요/싫어요 갯수 수정하기 -->
+<select id="boardLikeUpdate" parameterType="HashMap">
+	update tbl_board set likecnt = #{likecnt}, dislikecnt = #{dislikecnt} where seqno = #{seqno}
+</select>
+
+<!-- 좋아요/싫어요 확인 등록하기 -->
+<insert id="likeCheckRegistry" parameterType="HashMap">
+	insert into tbl_like (seqno,userid,mylikecheck,mydislikecheck,likedate,dislikedate) 
+		values (#{seqno},#{userid},#{mylikecheck},#{mydislikecheck},#{likedate},#{dislikedate})
+</insert>
+
+<!-- 좋아요/싫어요 확인 수정하기 -->
+<update id="likeCheckUpdate" parameterType="HashMap">
+	update tbl_like set mylikecheck = #{mylikecheck}, mydislikecheck = #{mydislikecheck},
+		likedate = #{likedate}, dislikedate = #{dislikedate}
+</update>
 
 <!-- 댓글 보기 -->
 <select id="replyView" parameterType="com.SFTest.dto.ReplyVO" resultType="com.SFTest.dto.ReplyVO">

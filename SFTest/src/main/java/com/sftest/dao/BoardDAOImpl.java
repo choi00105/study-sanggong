@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.SFTest.dto.BoardVO;
 import com.SFTest.dto.ReplyVO;
+import com.SFTest.dto.LikeVO;
 
 @Repository
 public class BoardDAOImpl implements BoardDAO {
@@ -83,6 +84,38 @@ public class BoardDAOImpl implements BoardDAO {
 		sql.delete(namespace + ".delete", seqno);		
 	}
 	
+
+	//좋아요/싫어요 확인 가져 오기
+	@Override
+	public LikeVO likeCheckView(int seqno,String userid) throws Exception {
+		
+		Map<String,Object> data = new HashMap<>();
+		data.put("seqno", seqno);
+		data.put("userid", userid);
+		return sql.selectOne(namespace + ".likeCheckView", data);
+	}
+	
+	//좋아요/싫어요 갯수 수정하기
+	@Override
+	public void boardLikeUpdate(int seqno, int likecnt, int dislikecnt) throws Exception {
+		Map<String,Integer> data = new HashMap<>();
+		data.put("seqno", seqno);
+		data.put("likecnt", likecnt);
+		data.put("dislikecnt", dislikecnt);
+		sql.update(namespace + ".boardLikeUpdate", data);
+	}
+	
+	//좋아요/싫어요 확인 등록하기
+	@Override
+	public void likeCheckRegistry(Map<String,Object> map) throws Exception {
+		sql.insert(namespace + ".likeCheckRegistry", map);
+	}
+	
+	//좋아요/싫어요 확인 수정하기
+	@Override
+	public void likeCheckUpdate(Map<String,Object> map) throws Exception {
+		sql.update(namespace + ".likeCheckUpdate", map);
+	}
 	//댓글 보기
 	@Override
 	public List<ReplyVO> replyView(ReplyVO reply) throws Exception{

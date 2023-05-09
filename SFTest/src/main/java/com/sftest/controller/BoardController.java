@@ -3,6 +3,7 @@ package com.SFTest.controller;
 import java.io.File;
 import java.net.URLEncoder;
 import java.text.DateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import com.SFTest.dto.UserVO;
 import com.SFTest.mapper.SFTestMapper;
 import com.SFTest.service.BoardService;
 import com.SFTest.util.Page;
+import com.SFTest.dto.LikeVO;
 
 @Controller
 public class BoardController {
@@ -105,6 +107,22 @@ public class BoardController {
 		BoardVO view = service.view(seqno);
 		
 		//mapper.hitno(board);
+		//조회수 증가
+		String Sessioonuserid = (String)session.getAttribute("userid");
+		if(!Sessioonuserid.equals(view.getUserid())) 
+			service.hitno(view);
+		
+		LikeVO likeCheckView = service.likeCheckView(seqno, Sessioonuserid);
+		
+		//초기에 좋아요/싫어요 등록이 안되어져 있을 경우 "N"으로 초기화 
+		
+		if(likeCheckView == null) {
+			model.addAttribute("myLikeCheck", "N");
+			model.addAttribute("myDislikeCheck", "N");
+		} else if(likeCheckView != null) {
+			model.addAttribute("myLikeCheck", likeCheckView.getMylikecheck());
+			model.addAttribute("myDislikeCheck", likeCheckView.getMydislikecheck());
+		}
 		
 		if(!SessionUserid.equals(view.getUserid()))
 			service.hitno(view);
@@ -114,9 +132,61 @@ public class BoardController {
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("pre_seqno", service.pre_seqno(seqno, keyword));
 		model.addAttribute("next_seqno", service.next_seqno(seqno, keyword));
+		model.addAttribute("likeCheckView", likeCheckView);
 		
 	}
 	
+	//좋아요/싫어요 관리
+	@ResponseBody
+	@PostMapping(value = "/board/likeCheck")
+	public Map<String, Object> postLikeCheck(@RequestBody Map<String, Object> likeCheckData) throws Exception {
+		System.out.println("=== /board/likeCheck");
+		int seqno = (int)likeCheckData.get("seqno");
+		String userid = (String)likeCheckData.get("userid");
+		int checkCnt = (int)likeCheckData.get("checkCnt");
+
+		//현재 날짜, 시간 구해서 좋아요/싫어요 한 날짜/시간 입력 및 수정
+		String likeDate = "";
+		String dislikeDate = "";
+		if(likeCheckData.get("mylikecheck").equals("Y")) 
+			likeDate = LocalDateTime.now().toString();
+		else if(likeCheckData.get("mydislikecheck").equals("Y")) 
+			dislikeDate = LocalDateTime.now().toString();
+
+		likeCheckData.put("likedate", likeDate);
+		likeCheckData.put("dislikedate", dislikeDate);
+
+		//TBL_LIKE 테이블 입력/수정
+		LikeVO likeCheckView = service.likeCheckView(seqno,userid);
+		if(likeCheckView == null) service.likeCheckRegistry(likeCheckData);
+			else service.likeCheckUpdate(likeCheckData);
+
+		//TBL_BOARD 내의 likecnt,dislikecnt 입력/수정 
+		BoardVO board = service.view(seqno);
+		
+		int likeCnt = board.getLikecnt();
+		int dislikeCnt = board.getDislikecnt();
+			
+		switch(checkCnt){
+	    	case 1 : likeCnt --; break;
+	    	case 2 : likeCnt ++; dislikeCnt --; break;
+	    	case 3 : likeCnt ++; break;
+	    	case 4 : dislikeCnt --; break;
+	    	case 5 : likeCnt --; dislikeCnt ++; break;
+	    	case 6 : dislikeCnt ++; break;
+		}
+		
+		service.boardLikeUpdate(seqno,likeCnt,dislikeCnt);
+		
+		//AJAX에 전달할 map JSON 데이터 만들기
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("seqno", seqno);
+		map.put("likeCnt", likeCnt);
+		map.put("dislikeCnt", dislikeCnt);
+		
+		return map;
+	}
+
 	//게시물 수정(화면 보기)
 	@GetMapping("/board/modify")
 	public void getModify(@RequestParam("seqno") int seqno, @RequestParam("page") int pageNum, Model model,

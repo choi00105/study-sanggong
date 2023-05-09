@@ -9,6 +9,116 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 
+<!-- 좋아요, 싫어요 제이쿼리 처리 함수 시작 -->
+	
+	var likeCnt; 
+	var dislikeCnt; 
+	var myLikeCheck; 
+	var myDislikeCheck; 
+	var username;
+	
+	// 게시물 상세 보기 화면 로딩시 좋아요/실어요 값 사져와서 화면 구성해 주는 부분
+	$(document).ready(function(){
+		likeCnt = ${view.likecnt}; 
+		dislikeCnt = ${view.dislikecnt}; 
+		myLikeCheck = '${myLikeCheck}'; 
+		myDislikeCheck = '${myDislikeCheck}'; 
+		username = '${username}';
+		$("#like").html(likeCnt);
+		$("#dislike").html(dislikeCnt);
+		
+		if(myLikeCheck == "Y") $(".likeClick").css("background-color", "#00B9FF"); 
+		    else if(myDislikeCheck == "Y") $(".dislikeClick").css("background-color", "#00B9FF"); 
+		
+		if(myLikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 좋아요입니다."); 
+		        else if(myDislikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 싫어요입니다."); 
+		        else if(myLikeCheck == "N" && myDislikeCheck == "N") $("#myChoice").html(username + "님은 아직 선택을 안 했네요"); 
+	});
+	
+	function likeView(){ 
+	    
+	    if(myLikeCheck == "Y" && myDislikeCheck =="N") {
+	        alert("좋아요를 취소합니다."); 
+	        var checkCnt = 1;  //likeCnt --; --> 6개의 조건 중 하나
+	        myLikeCheck = "N";
+	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt); 
+	        $(".likeClick").css("background-color", "#d2d2d2"); 
+	    }else if(myLikeCheck == "N" && myDislikeCheck =="Y") {
+	        alert("싫어요가 취소되고 좋아요가 등록됩니다.");
+	        var checkCnt = 2; // likeCnt ++ , dislikeCnt --
+	        myLikeCheck = "Y";
+	        myDislikeCheck = "N";
+	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt);  
+	        $(".likeClick").css("background-color", "#00B9FF"); 
+	        $(".dislikeClick").css("background-color", "#d2d2d2");
+	    } else if(myLikeCheck == "N" && myDislikeCheck =="N") {
+	        alert("좋아요를 선택 했습니다.")
+	    	var checkCnt = 3; //likeCnt ++
+	        myLikeCheck = "Y";
+	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt);
+	        $(".likeClick").css("background-color", "#00B9FF"); 
+	    }
+	    if(myLikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 좋아요입니다."); 
+	        else if(myDislikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 싫어요입니다."); 
+	        else if(myLikeCheck == "N" && myDislikeCheck == "N") $("#myChoice").html(username + "님은 아직 선택을 안 했네요"); 
+	}
+	
+	function disLikeView() {
+	    
+	    if(myDislikeCheck == "Y" && myLikeCheck =="N") {
+	        alert("싫어요를 취소합니다."); 
+	        var checkCnt = 4; // dislikeCnt --
+	        myDislikeCheck = "N";
+	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt);
+	        $(".dislikeClick").css("background-color", "#d2d2d2"); 
+	    } else if(myDislikeCheck = "N" && myLikeCheck =="Y") {
+	        alert("좋아요가 취소되고 싫어요가 등록됩니다.");
+	        var checkCnt = 5; //likeCnt -- , dislikeCnt ++            
+	        myLikeCheck = "N";            
+	        myDislikeCheck = "Y";
+	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt);
+	        $(".likeClick").css("background-color", "#d2d2d2"); 
+	        $(".dislikeClick").css("background-color", "#00B9FF"); 
+	    } else if(myDislikeCheck = "N" && myLikeCheck =="N") {
+	        alert("싫어요를 선택했습니다.");
+	    	var checkCnt = 6; //dislikeCnt ++
+	        myDislikeCheck = "Y";
+	        sendDataToServer(myLikeCheck,myDislikeCheck,checkCnt);
+	        $(".dislikeClick").css("background-color", "#00B9FF"); 
+	    }
+	    if(myLikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 좋아요입니다."); 
+	        else if(myDislikeCheck == "Y") $("#myChoice").html(username + "님의 선택은 싫어요입니다."); 
+	        else if(myLikeCheck == "N" && myDislikeCheck == "N") $("#myChoice").html(username + "님은 아직 선택을 안 했네요"); 
+	}
+	
+	function sendDataToServer(myLike, myDislike, checkCount) {
+	
+	    var myLikeCheck = myLike;
+	    var myDislikeCheck = myDislike;
+	    var checkCnt = checkCount;
+	    
+	    var queryString = {"seqno":${view.seqno},"userid":"${userid}",
+	    		"mylikecheck":myLikeCheck,"mydislikecheck":myDislikeCheck,"checkCnt":checkCnt};
+	    $.ajax({ //JSON --> MAP 타입일 경우 contentType를 반드시 입력...
+	        url: "/board/likeCheck",
+	        method: "POST",
+	        data: JSON.stringify(queryString),
+	        contentType: 'application/json; charset=UTF-8',
+	        dataType : "json",
+	        success: function(map) {
+	            $("#like").html(map["likeCnt"]);
+	            $("#dislike").html(map["dislikeCnt"]);
+	        },
+	        error: function(map) {
+				alert("서버오류 문제로 좋아요/싫어요 등록이 실패 했습니다. 잠시 후 다시 시도해주시기 바랍니다.");
+	  	    	return false;
+			}
+	    }); //End of ajax
+	
+	}
+<!-- 좋아요, 싫어요 제이쿼리 처리 함수 끝-->
+
+
 	const deleteBoard = () => {
 		if(confirm("정말로 삭제하시겠습니까?"))
 			document.location.href='/board/delete?seqno=${view.seqno}';
@@ -263,6 +373,22 @@
 	
 </script>
 <style>
+.likeForm{
+	text-align: center;
+	width: 50%;
+	height: auto;
+	margin: 20px auto;
+}
+.likeClick, .dislikeClick {
+    padding: 10px 10px;
+	text-align: center;	
+	text-decoration: none;
+    border: solid 1px #a0a0a0;
+    display: inline-block;
+    background-color: #d2d2d2;
+    border-radius: 20px
+}
+
 .bottom_menu {
 	margin-top: 20px;
 }
@@ -297,13 +423,20 @@
 </div>
 
 <div class="main">
-	<h1>게시물 내용 보기, ${userid}, ${view.userid}</h1>
+	<h1>게시물 내용 보기, </h1>
+	<p>세션에서 받은 userid: ${userid},<br> view에서 받은 userid: ${view.userid}</p>
+	
 	<br>
 	<div class="boardView">
 		<div class="field">이름 : ${view.writer}</div>
 		<div class="field">제목 : ${view.title}</div>
 		<div class="field">날짜 : ${view.regdate}</div>
 		<div class="content"><pre>${view.content}</pre></div>
+		<div class="likeForm">
+         	<span id='like'></span>&nbsp;<a href='javascript:likeView()' id="likeClick" class="likeClick">👍</a>
+        	<a href="javascript:disLikeView()" id="disLikeClick" class="dislikeClick">👎</a>&nbsp;<span id="dislike"></span><br>
+  			<span id='myChoice' style='color:red'></span>
+        </div>
 		<c:if test="${view.org_filename != NULL}">
 			<div style="text-align: center">파일명 : 
 			  <a href="/board/filedownload?seqno=${view.seqno}">${view.org_filename}</a>(${view.filesize} byte)</div>

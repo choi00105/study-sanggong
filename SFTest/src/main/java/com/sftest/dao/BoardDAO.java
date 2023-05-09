@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.SFTest.dto.BoardVO;
+import com.SFTest.dto.LikeVO;
 import com.SFTest.dto.ReplyVO;
+
 
 public interface BoardDAO {
 
@@ -34,6 +36,19 @@ public interface BoardDAO {
 	
 	//게시물 삭제
 	public void delete(int seqno);
+	
+	//좋아요/싫어요 확인 가져 오기
+	public LikeVO likeCheckView(int seqno,String userid) throws Exception;
+	
+	//좋아요/싫어요 갯수 수정하기
+	public void boardLikeUpdate(int seqno, int likecnt, int dislikecnt) throws Exception;
+	
+	//좋아요/싫어요 확인 등록하기
+	public void likeCheckRegistry(Map<String,Object> map) throws Exception;
+	
+	//좋아요/싫어요 확인 수정하기
+	public void likeCheckUpdate(Map<String,Object> map) throws Exception;
+	
 	
 	//댓글 보기
 	public List<ReplyVO> replyView(ReplyVO reply) throws Exception;

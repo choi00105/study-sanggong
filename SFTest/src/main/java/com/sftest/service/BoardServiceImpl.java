@@ -1,6 +1,7 @@
 package com.SFTest.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.SFTest.dao.BoardDAO;
 import com.SFTest.dto.BoardVO;
 import com.SFTest.dto.ReplyVO;
+import com.SFTest.dto.LikeVO;
 
 @Service
 public class BoardServiceImpl implements BoardService {
@@ -67,7 +69,30 @@ public class BoardServiceImpl implements BoardService {
 	public void delete(int seqno) {
 		dao.delete(seqno);		
 	}
+
+	//좋아요/싫어요 확인 가져 오기
+	@Override
+	public LikeVO likeCheckView(int seqno,String userid) throws Exception {
+		return dao.likeCheckView(seqno, userid);
+	}
 	
+	//좋아요/싫어요 갯수 수정하기
+	@Override
+	public void boardLikeUpdate(int seqno, int likecnt, int dislikecnt) throws Exception {
+		dao.boardLikeUpdate(seqno, likecnt, dislikecnt);
+	}
+	
+	//좋아요/싫어요 확인 등록하기
+	@Override
+	public void likeCheckRegistry(Map<String,Object> map) throws Exception {
+		dao.likeCheckRegistry(map);
+	}
+	
+	//좋아요/싫어요 확인 수정하기
+	@Override
+	public void likeCheckUpdate(Map<String,Object> map) throws Exception {
+		dao.likeCheckUpdate(map);
+	}
 	//댓글 보기
 	@Override
 	public List<ReplyVO> replyView(ReplyVO reply) throws Exception{

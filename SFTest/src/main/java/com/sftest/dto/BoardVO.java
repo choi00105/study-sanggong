@@ -13,7 +13,10 @@ public class BoardVO {
     private String stored_filename;
     private long filesize; 
     private int hitno;
+    private int likecnt;
+    private int dislikecnt;
     
+
 	public int getSeqno() {
 		return seqno;
 	}
@@ -81,6 +84,17 @@ public class BoardVO {
 		this.filesize = filesize;
 	}  
 	
-	
+	public int getLikecnt() {
+		return likecnt;
+	}
+	public void setLikecnt(int likecnt) {
+		this.likecnt = likecnt;
+	}
+	public int getDislikecnt() {
+		return dislikecnt;
+	}
+	public void setDislikecnt(int dislikecnt) {
+		this.dislikecnt = dislikecnt;
+	}
 	
 }
