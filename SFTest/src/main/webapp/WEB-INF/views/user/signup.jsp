@@ -61,7 +61,7 @@ const register = async () => {
 	}).then((response) => response.json())
 	.then((data) => {
 		if(data.status === 'good'){
-			alert(data.username + "님, 회원 등록 완료");
+			alert(decodeURIComponent(data.username) + "님, 회원 등록 완료");
 			document.location.href="/board/list?page=1";
 		} else {
 			alert("서버 장애로 회원 가입에 실패 했습니다.");
