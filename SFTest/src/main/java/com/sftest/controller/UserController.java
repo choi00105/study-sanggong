@@ -1,7 +1,10 @@
 package com.SFTest.controller;
 
+import java.io.File;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
@@ -12,18 +15,25 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.SFTest.dto.AddressVO;
 import com.SFTest.dto.UserVO;
 import com.SFTest.mapper.SFTestMapper;
+import com.SFTest.service.UserService;
+import com.SFTest.util.Page;
+
 
 @Controller
 public class UserController {
 
 	@Autowired
-	SFTestMapper mapper;
+	UserService service;
 	
 	@Autowired //비밀번호 암호화 의존성 주입
 	private BCryptPasswordEncoder pwdEncoder; 
@@ -37,12 +47,12 @@ public class UserController {
 			RedirectAttributes rttr) {
 		
 		//아이디 존재 여부 확인
-		if(mapper.idCheck(loginData.getUserid()) == 0) {
+		if(service.idCheck(loginData.getUserid()) == 0) {
 			rttr.addFlashAttribute("message", "ID_NOT_FOUND");
 			return "redirect:/user/login";
 		}
 		
-		UserVO member = mapper.login(loginData.getUserid());
+		UserVO member = service.login(loginData.getUserid());
 		
 		//패스워드 확인
 		if(!pwdEncoder.matches(loginData.getPassword(),member.getPassword())) {
@@ -76,14 +86,33 @@ public class UserController {
 	//회원 가입
 	@ResponseBody
 	@PostMapping("/user/signup")
-	public String postSignup(@RequestBody UserVO user) throws Exception {
-	
+	public String postSignup(UserVO user, @RequestParam("fileUpload") MultipartFile mpr) throws Exception {
+		
+		String path = "c:\\Repository\\profile\\"; 
+		String org_filename = "";
+		long filesize = 0L;
+		
+		if(!mpr.isEmpty()) {
+			File targetFile = null; 
+				
+			org_filename = mpr.getOriginalFilename();	
+			String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));	
+			String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;	
+			filesize = mpr.getSize();
+			targetFile = new File(path + stored_filename);
+			mpr.transferTo(targetFile);	//raw data를 targetFile에서 가진 정보대로 변환
+			user.setOrg_filename(org_filename);
+			user.setStored_filename(stored_filename);
+			user.setFilesize(filesize);
+		}
+		
 		user.setPassword(pwdEncoder.encode(user.getPassword()));
 		
-		mapper.signup(user);		
+		service.signup(user);		
 		
 		return "{ \"username\": \"" + URLEncoder.encode(user.getUsername()) + "\", \"status\": \"good\" }";
 		// json 포맷으로 문자열 만든 것 {username: "김철수", status: "good"}
+		
 		
 	}
 	
@@ -92,9 +121,28 @@ public class UserController {
 	@PostMapping("/user/idCheck")
 	public int getIdCheck(@RequestBody String userid) {
 		
-		return mapper.idCheck(userid);
+		return service.idCheck(userid);
 		
 	}
 	
-	
+	//우편번호 검색
+	@GetMapping(value="/user/addrSearch")
+	public void getSearchAddr(@RequestParam("addrSearch") String addrSearch,
+			@RequestParam("page") int pageNum,Model model) throws Exception {
+		
+		int postNum = 5;
+		int startPoint = (pageNum -1)*postNum + 1; //테이블에서 읽어 올 행의 위치
+		int endPoint = pageNum*postNum;
+		int listCount = 10;
+		
+		Page page = new Page();
+		
+		int totalCount = service.addrTotalCount(addrSearch);
+		List<AddressVO> list = new ArrayList<>();
+		list = service.addrSearch(startPoint, postNum, addrSearch);
+
+		model.addAttribute("list", list);
+		model.addAttribute("pageListView", page.getPageAddress(pageNum, postNum, listCount, totalCount, addrSearch));
+		
+	}
 }

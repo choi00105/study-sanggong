@@ -4,21 +4,36 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.SFTest.mappers.User">
 
-<!-- 아이디 중복 체크. 카운터가 0이면 아이디 사용 가능, 1이면 기존 사용 중인 아이디 -->
-<select id="idCheck" parameterType="string" resultType="int">
-	select count(*) from tbl_user where userid = #{userid}
-</select>
-
-<!-- 로그인 정보 가져 오기 -->
-<select id="login" parameterType="string" resultType="com.SFTest.dto.UserVO">
-	select password,username from tbl_user where userid = #{userid}
-</select>
-
-
-<!-- 사용자 등록 -->
-<insert id="signup" parameterType="com.SFTest.dto.UserVO">
-	insert into tbl_user (userid,username,password,gender,hobby,job,description) values
-	 (#{userid},#{username},#{password},#{gender},#{hobby},#{job},#{description})
-</insert>
+	<!-- 아이디 중복 체크. 카운터가 0이면 아이디 사용 가능, 1이면 기존 사용 중인 아이디 -->
+	<select id="idCheck" parameterType="string" resultType="int">
+		select count(*) from tbl_user where userid = #{userid}
+	</select>
+	
+	<!-- 로그인 정보 가져 오기 -->
+	<select id="login" parameterType="string" resultType="com.SFTest.dto.UserVO">
+		select password,username from tbl_user where userid = #{userid}
+	</select>
+	
+	
+	<!-- 사용자 등록 -->
+	<insert id="signup" parameterType="com.SFTest.dto.UserVO">
+		insert into tbl_user (userid,username,password,gender,hobby,job,description, zipcode, address, telno, email, role, org_filename, stored_filename, filesize) values
+		 (#{userid},#{username},#{password},#{gender},#{hobby},#{job},#{description}, #{zipcode}, #{address}, #{telno}, #{email}, #{role}, #{org_filename}, #{stored_filename}, #{filesize})
+	</insert>
+	
+	
+	<!-- 우편번호 행 최대 갯수 계산 -->
+	<select id="addrTotalCount" parameterType="string" resultType="int">
+		select count(*) from tbl_addr where road like CONCAT('%',#{addSearch},'%')
+			or building like CONCAT('%',#{addrSearch},'%')
+	</select>
+	
+	<!-- 우편번호 검색 -->
+	<select id="addrSearch" parameterType="HashMap" resultType="com.SFTest.dto.AddressVO">
+	    select zipcode, province, road, building, oldaddr from tbl_addr 
+	    	where road like concat('%',#{addrSearch},'%') or building like concat('%',#{addrSearch},'%') 
+	    		order by zipcode limit #{startPoint}, #{postNum}
+	</select>
+	
 	
 </mapper>  

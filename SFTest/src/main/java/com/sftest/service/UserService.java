@@ -1,6 +1,9 @@
 package com.SFTest.service;
 
+import java.util.List;
+
 import com.SFTest.dto.UserVO;
+import com.SFTest.dto.AddressVO;
 
 public interface UserService {
 
@@ -12,5 +15,11 @@ public interface UserService {
 	
 	//사용자등록
 	public void signup(UserVO user);
+	
+	//주소 전체 갯수 계산
+	public int addrTotalCount(String addrSearch);
+
+	//주소 검색
+	public List<AddressVO> addrSearch(int startPoint, int postNum, String addrSearch);
 	
 }

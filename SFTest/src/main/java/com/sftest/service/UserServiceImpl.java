@@ -1,9 +1,13 @@
 package com.SFTest.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.SFTest.dao.UserDAO;
+import com.SFTest.dto.AddressVO;
+
 import com.SFTest.dto.UserVO;
 
 @Service
@@ -28,6 +32,18 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void signup(UserVO user) {
 		dao.signup(user);		
+	}
+	
+	//주소 전체 갯수 계산
+	@Override
+	public int addrTotalCount(String addrSearch) {
+		return dao.addrTotalCount(addrSearch);
+	}
+
+	//주소 검색
+	@Override
+	public List<AddressVO> addrSearch(int startPoint, int postNum, String addrSearch){
+		return dao.addrSearch(startPoint, postNum, addrSearch);
 	}
 
 }

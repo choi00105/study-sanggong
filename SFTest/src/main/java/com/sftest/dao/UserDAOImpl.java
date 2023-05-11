@@ -1,10 +1,15 @@
 package com.SFTest.dao;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.SFTest.dto.UserVO;
+import com.SFTest.dto.AddressVO;
 
 @Repository
 public class UserDAOImpl implements UserDAO {
@@ -31,4 +36,21 @@ public class UserDAOImpl implements UserDAO {
 		sql.insert(namespace + ".signup", user);		
 	}
 
+	
+	//주소 전체 갯수 계산
+	@Override
+	public int addrTotalCount(String addrSearch) {
+		return sql.selectOne(namespace + ".addrTotalCount", addrSearch);
+	}
+
+	//주소 검색
+	@Override
+	public List<AddressVO> addrSearch(int startPoint, int postNum, String addrSearch){
+		Map<String, Object> data = new HashMap<>();
+		data.put("startPoint", startPoint);
+		data.put("postNum", postNum);
+		data.put("addrSearch", addrSearch);
+		return  sql.selectList(namespace + ".addrSearch", data);
+	}
+	
 }

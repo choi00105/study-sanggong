@@ -10,7 +10,7 @@ a:active { color: red; }
        margin-top:10px;
        margin-bottom:10px;
        max-width: 500px;
-       height: auto;
+       height: 60px;
        display: block; margin: 0 auto;
 }
 
@@ -88,7 +88,7 @@ a:active { color: red; }
 }
 
 .WriteForm {
-  width:50%;
+  width:90%;
   height:auto;
   margin: auto;
   padding: 20px, 20px;
@@ -226,4 +226,9 @@ a:active { color: red; }
 .bottom_menu > a:hover, .bottom_menu > a:active {
 	background-color: #1E90FF;
 	text-decoration: none;
+}
+.gray_font {
+	color: gray;
+	font-size:10px;
+	
 }

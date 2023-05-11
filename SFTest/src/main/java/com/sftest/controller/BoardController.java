@@ -116,7 +116,6 @@ public class BoardController {
 		LikeVO likeCheckView = service.likeCheckView(seqno, Sessioonuserid);
 		
 		//초기에 좋아요/싫어요 등록이 안되어져 있을 경우 "N"으로 초기화 
-		
 		if(likeCheckView == null) {
 			model.addAttribute("myLikeCheck", "N");
 			model.addAttribute("myDislikeCheck", "N");

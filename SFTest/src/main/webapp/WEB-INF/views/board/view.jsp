@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -9,8 +8,6 @@
 <link rel="stylesheet" href="/resources/css/board.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
-
-//화면 로딩시 좋아요 싫어요 초기 값 및 상태 보여주기
 var likeCnt; 
 var dislikeCnt; 
 var myLikeCheck; 
@@ -46,37 +43,7 @@ var username;
 		startupPage();
 	}
 
-	const startupPage = async () => {
-		/*
-		var queryString = { "seqno": "${view.seqno}" };
-		$.ajax({
-			url : "reply?option=L",
-			type : "post",
-			datatype : "json",
-			data : queryString,
-			success : replyList,
-			error : function(data) {
-							alert("서버 오류로 댓글 불러 오기가 실패했습니다.");
-	              	    	return false;
-					}
-		}); //End od ajax
-		*/
-		// 댓글 불러오기
-		const data = {seqno: "${view.seqno}"};
-		
-		await fetch('/board/reply?option=L',{
-			method: 'POST',
-			headers: {
-				"content-type": "application/json"
-			},
-			body: JSON.stringify(data)
-		}).then((response) => response.json())
-			.then((data) => replyList(data))
-			.catch((error) => {
-				console.log("error = "+error);
-				alert("시스템 장애로 페이지 로딩이 실패했습니다.");
-			});
-	}
+	
 <!-- 좋아요, 싫어요 제이쿼리 처리 함수 시작 -->
 	function likeView(){ 
 	    
@@ -166,8 +133,8 @@ var username;
 			}
 	    }); //End of ajax
 	    */	    
-	    const data = {"seqno":${view.seqno},"userid":"${userid}",
-	    	    "mylikecheck":myLikeCheck,"mydislikecheck":myDislikeCheck,"checkCnt":checkCnt};
+	    const data = {"seqno": ${view.seqno}, "userid": "${userid}",
+	    	    "mylikecheck": myLikeCheck, "mydislikecheck": myDislikeCheck,"checkCnt": checkCnt};
 	    	await fetch('/board/likeCheck', {
 	    	    method: 'POST',
 	    	    headers: {
@@ -261,7 +228,37 @@ var username;
 		//$("#replyListView").remove();
 		//$("#replyList").html(result); 
 	}
-	
+	const startupPage = async () => {
+		/*
+		var queryString = { "seqno": "${view.seqno}" };
+		$.ajax({
+			url : "reply?option=L",
+			type : "post",
+			datatype : "json",
+			data : queryString,
+			success : replyList,
+			error : function(data) {
+							alert("서버 오류로 댓글 불러 오기가 실패했습니다.");
+	              	    	return false;
+					}
+		}); //End od ajax
+		*/
+		// 댓글 불러오기
+		const data = {seqno: "${view.seqno}"};
+		
+		await fetch('/board/reply?option=L',{
+			method: 'POST',
+			headers: {
+				"content-type": "application/json"
+			},
+			body: JSON.stringify(data)
+		}).then((response) => response.json())
+			.then((data) => replyList(data))
+			.catch((error) => {
+				console.log("error = "+error);
+				alert("시스템 장애로 페이지 로딩이 실패했습니다.");
+			});
+	}
 	const replyDelete = async (replyseqno) => { 
 		/*
 		var rseqno = replyseqno

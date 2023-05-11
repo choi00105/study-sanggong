@@ -72,6 +72,7 @@
 		</tr>
 		
 		<tbody>
+		<c:if test="${list != null}"> 
 			<c:forEach items="${list}" var="list">
 				<tr onmouseover="this.style.background='#46D2D2'" onmouseout="this.style.background='white'">
 					<td>${list.seq}</td>
@@ -83,6 +84,12 @@
 					<td>${list.hitno}</td>
 				</tr>
 			</c:forEach>
+		</c:if>
+		<c:if test="${list == null}">
+			<tr>
+				<td colspan="5">등록된 게시물이 없습니다.</td>
+			</tr>
+		</c:if>
 		</tbody>	
 	</table>
 	<br>

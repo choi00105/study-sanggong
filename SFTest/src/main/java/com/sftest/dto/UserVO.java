@@ -9,7 +9,72 @@ public class UserVO {
 	private String hobby;
 	private String job;
 	private String description;
+	private String zipcode;
+	private String address;
+	private String telno;
+	private String email;
+	private String authkey;
+	private String role;
+	private String org_filename;
+	private String stored_filename;
+	private long filesize;
 	
+
+	
+	public String getOrg_filename() {
+		return org_filename;
+	}
+	public void setOrg_filename(String org_filename) {
+		this.org_filename = org_filename;
+	}
+	public String getStored_filename() {
+		return stored_filename;
+	}
+	public void setStored_filename(String stored_filename) {
+		this.stored_filename = stored_filename;
+	}
+	public long getFilesize() {
+		return filesize;
+	}
+	public void setFilesize(long filesize) {
+		this.filesize = filesize;
+	}
+	public String getZipcode() {
+		return zipcode;
+	}
+	public void setZipcode(String zipcode) {
+		this.zipcode = zipcode;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public String getTelno() {
+		return telno;
+	}
+	public void setTelno(String telno) {
+		this.telno = telno;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getAuthkey() {
+		return authkey;
+	}
+	public void setAuthkey(String authkey) {
+		this.authkey = authkey;
+	}
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
+	}
 	public String getUserid() {
 		return userid;
 	}
