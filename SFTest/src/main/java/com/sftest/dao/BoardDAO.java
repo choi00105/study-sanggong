@@ -6,6 +6,7 @@ import java.util.Map;
 import com.SFTest.dto.BoardVO;
 import com.SFTest.dto.LikeVO;
 import com.SFTest.dto.ReplyVO;
+import com.SFTest.dto.FileVO;
 
 
 public interface BoardDAO {
@@ -18,6 +19,24 @@ public interface BoardDAO {
 	
 	//게시물 등록
 	public void write(BoardVO board);
+	
+	//파일 업로드 정보 등록
+	public void fileInfoRegistry(Map<String,Object> fileInfo) throws Exception;
+
+	//게시글 내에서 업로드된 파일 목록 보기
+	public List<FileVO> fileListView(int seqno) throws Exception;
+
+	//게시물 수정에서 파일 삭제
+	public void deleteFileList(int fileseqno) throws Exception;
+	
+	//게시물 삭제에서 파일 삭제를 위한 파일 목록 가져 오기
+	public List<FileVO> deleteFileOnBoard(int seqno) throws Exception;
+	
+	//회원 탈퇴 시 회원이 업로드한 파일 정보 가져 오기
+	public List<FileVO> fileInfoByUserid(String userid) throws Exception; 
+
+	//다운로드를 위한 파일 정보 보기
+	public FileVO fileInfo(int fileseqno) throws Exception;
 	
 	//게시물 상세 보기
 	public BoardVO view(int seqno);

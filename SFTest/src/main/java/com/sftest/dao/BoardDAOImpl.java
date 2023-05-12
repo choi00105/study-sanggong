@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.SFTest.dto.BoardVO;
 import com.SFTest.dto.ReplyVO;
+import com.SFTest.dto.FileVO;
 import com.SFTest.dto.LikeVO;
 
 @Repository
@@ -40,6 +41,41 @@ public class BoardDAOImpl implements BoardDAO {
 	@Override
 	public void write(BoardVO board) {
 		sql.insert(namespace + ".write",board);		
+	}
+	//파일 업로드 정보 등록
+	@Override
+	public void fileInfoRegistry(Map<String,Object> fileInfo) throws Exception{
+		sql.insert(namespace + ".fileInfoRegistry", fileInfo);
+	}
+
+	//게시글 내에서 업로드된 파일 목록 보기
+	@Override
+	public List<FileVO> fileListView(int seqno) throws Exception{
+		return sql.selectList(namespace + ".fileListView", seqno);
+	}
+
+	//게시물 수정에서 파일 삭제
+	@Override
+	public void deleteFileList(int fileseqno) throws Exception{
+		sql.delete(namespace + ".deleteFileList", fileseqno);
+	}
+	
+	//게시물 삭제에서 파일 삭제를 위한 파일 목록 가져 오기
+	@Override
+	public List<FileVO> deleteFileOnBoard(int seqno) throws Exception{
+		return sql.selectList(namespace + ".deleteFileOnBoard", seqno);
+	}
+	
+	//회원 탈퇴 시 회원이 업로드한 파일 정보 가져 오기
+	@Override
+	public List<FileVO> fileInfoByUserid(String userid) throws Exception{
+		return sql.selectList(namespace + ".fileInfoByUserid", userid);
+	}
+
+	//다운로드를 위한 파일 정보 보기
+	@Override
+	public FileVO fileInfo(int fileseqno) throws Exception{
+		return sql.selectOne(namespace + ".fileInfo", fileseqno);
 	}
 
 	//게시물 상세 보기
@@ -84,7 +120,6 @@ public class BoardDAOImpl implements BoardDAO {
 		sql.delete(namespace + ".delete", seqno);		
 	}
 	
-
 	//좋아요/싫어요 확인 가져 오기
 	@Override
 	public LikeVO likeCheckView(int seqno,String userid) throws Exception {

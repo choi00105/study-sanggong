@@ -450,13 +450,14 @@ var username;
         	<a href="javascript:disLikeView()" id="disLikeClick" class="dislikeClick">👎</a>&nbsp;<span id="dislike"></span><br>
   			<span id='myChoice' style='color:red'></span>
         </div>
-		<c:if test="${view.org_filename != NULL}">
-			<div style="text-align: center">파일명 : 
-			  <a href="/board/filedownload?seqno=${view.seqno}">${view.org_filename}</a>(${view.filesize} byte)</div>
+		<c:if test="${fileListView != null}">
+        	<c:forEach items="${fileListView}" var="fileView">
+				<div class="filename">파일명 : <a href="javascript:fileDownload('${fileView.fileseqno}')">${fileView.org_filename}</a> ( ${fileView.filesize} Byte )</div>
+			</c:forEach>
 		</c:if>
-		<c:if test="${view.org_filename == NULL}">
-			<div style="text-align: center">업로드 된 파일이 없습니다.</div>
-		</c:if>	
+		<c:if test="${fileListView == null}">
+			<div class="field">업로드된 파일이 없습니다.</div>
+		</c:if>
 		<br><br>
 	</div>
 	<br>

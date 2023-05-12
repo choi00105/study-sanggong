@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.SFTest.dto.BoardVO;
+import com.SFTest.dto.FileVO;
 import com.SFTest.dto.ReplyVO;
 import com.SFTest.dto.UserVO;
 import com.SFTest.mapper.SFTestMapper;
@@ -69,35 +70,77 @@ public class BoardController {
 	@GetMapping("/board/write")
 	public void getWrite() {}
 	
-	//게시물 등록
+	
+	
+	//첨부 파일 없는 게시물 등록
+	@ResponseBody
 	@PostMapping("/board/write")
-	public String postWrite(BoardVO board,
-			@RequestParam("fileUpload") MultipartFile mpr) throws Exception{
-		System.out.println("===POST /board/write --> redirect:/board/list?page=1");
-		String path = "c:\\Repository\\test\\"; 
-		String org_filename = "";
-		long filesize = 0L;
+	public void PostWrite(BoardVO board) throws Exception{
+		System.out.println("===GET /board/write");
+		//int seqno = service.getSeqnoWithNextval();
+		//board.setSeqno(seqno);
+		service.write(board);		
+
+	}
 		
-		if(!mpr.isEmpty()) {
-			File targetFile = null; 
+	//파일 업로드
+	@ResponseBody
+	@PostMapping("/board/fileUpload")
+	public void postFileUpload(BoardVO board,@RequestParam("SendToFileList") List<MultipartFile> multipartFile, 
+			@RequestParam("kind") String kind,@RequestParam(name="deleteFileList", required=false) int[] deleteFileList) throws Exception{
+
+		String path = "c:\\Repository\\file\\"; 
+		int seqno =0;
+		
+		if(kind.equals("U")) {
+			seqno = board.getSeqno();
+			service.modify(board);
+			
+			if(deleteFileList != null) {
 				
-			org_filename = mpr.getOriginalFilename();	
-			String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));	
-			String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;	
-			filesize = mpr.getSize();
-			targetFile = new File(path + stored_filename);
-			mpr.transferTo(targetFile);	//raw data를 targetFile에서 가진 정보대로 변환
-			board.setOrg_filename(org_filename);
-			board.setStored_filename(stored_filename);
-			board.setFilesize(filesize);
+				for(int i=0; i<deleteFileList.length; i++) {
+
+					//파일 삭제
+					FileVO fileInfo = new FileVO();
+					fileInfo = service.fileInfo(deleteFileList[i]);
+					File file = new File(path + fileInfo.getStored_filename());
+					file.delete();
+					
+					//파일 테이블에서 파일 정보 삭제
+					service.deleteFileList(deleteFileList[i]);
+					
+				}
+			}	
 		}
 		
-		//mapper.write(board);
-		service.write(board);
-		
-		return "redirect:/board/list?page=1";
-	}
+		if(!multipartFile.isEmpty()) {
+			File targetFile = null; 
+			Map<String,Object> fileInfo = null;		
+			
+			for(MultipartFile mpr:multipartFile) {
+				
+				String org_filename = mpr.getOriginalFilename();	
+				String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));	
+				String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;	
+				long filesize = mpr.getSize() ;
+				
+				targetFile = new File(path + stored_filename);
+				mpr.transferTo(targetFile);
+				
+				fileInfo = new HashMap<>();
+				fileInfo.put("org_filename",org_filename);
+				fileInfo.put("stored_filename", stored_filename);
+				fileInfo.put("filesize", filesize);
+				fileInfo.put("seqno", seqno);
+				fileInfo.put("userid", board.getUserid());
+				service.fileInfoRegistry(fileInfo);
 	
+			}
+		}
+		if(kind.equals("I")) { 
+			service.write(board);
+		}
+	}	
 	//게시물 내용 상세 보기 
 	@GetMapping("/board/view")
 	public void getView(@RequestParam("seqno") int seqno, @RequestParam("page") int pageNum,
@@ -133,6 +176,7 @@ public class BoardController {
 		model.addAttribute("pre_seqno", service.pre_seqno(seqno, keyword));
 		model.addAttribute("next_seqno", service.next_seqno(seqno, keyword));
 		model.addAttribute("likeCheckView", likeCheckView);
+		model.addAttribute("fileListView", service.fileListView(seqno));
 		
 	}
 	
@@ -267,117 +311,5 @@ public class BoardController {
 
 		return service.replyView(reply);
 	}
-	
-	
-	/***************************************************************/
-
-
-	
-	@PostMapping("/user/userinfo")
-	public void postUserInfo(UserVO user, Model model) {
-		
-		model.addAttribute("user", user);
-		
-	}
-	
-	@GetMapping("/board/imgView")
-	public void getImgView() throws Exception {
-		
-	}
-	
-	@GetMapping("/board/imgViews")
-	public void getImgViews() throws Exception {
-		
-	}
-	
-	@GetMapping("/board/fileUpload")
-	public void getFileUpload() {}
-	
-	@GetMapping("/board/fileUpload2")
-	public void getFileUpload2() {}
-	
-	@PostMapping("/board/fileUpload")
-	public void postFileUpload(@RequestParam("painter") String painter,
-			@RequestParam("fileUpload") List<MultipartFile> multipartFile) throws Exception {
-		
-		String path = "c:\\Repository\\test\\"; 
-		String org_filename = "";
-		long filesize = 0L;
-		
-		if(!multipartFile.isEmpty()) {
-			File targetFile = null; 
-			
-			for(MultipartFile mpr:multipartFile) {
-				
-				org_filename = mpr.getOriginalFilename();	
-				//String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));	
-				//String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;	
-				filesize = mpr.getSize() ;
-				
-				//File file = new File("c:\\Repository\\test\\kkk.txt"); //파일생성에 필요한 경로 및 파일 정보를 입력
-				targetFile = new File(path + org_filename);
-				mpr.transferTo(targetFile);	//raw data를 targetFile에서 가진 정보대로 변환
-				System.out.println("파일명 = " + org_filename);
-			}
-			
-			
-			System.out.println("파일사이즈 = " + filesize);
-			
-		}
-		
-	}
-	
-	@ResponseBody
-	@PostMapping("/board/fileUpload2")
-	public String postFileUpload2(@RequestParam("painter") String painter,
-			@RequestParam("fileUpload") List<MultipartFile> multipartFile) throws Exception {
-		
-		String path = "c:\\Repository\\test\\"; 
-		String org_filename = "";
-		long filesize = 0L;
-		
-		if(!multipartFile.isEmpty()) {
-			File targetFile = null; 
-			
-			for(MultipartFile mpr:multipartFile) {
-				
-				org_filename = mpr.getOriginalFilename();	
-				//String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));	
-				//String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;	
-				filesize = mpr.getSize() ;
-				
-				//File file = new File("c:\\Repository\\test\\kkk.txt"); //파일생성에 필요한 경로 및 파일 정보를 입력
-				targetFile = new File(path + org_filename);
-				mpr.transferTo(targetFile);	//raw data를 targetFile에서 가진 정보대로 변환
-				
-			}
-			
-		}
-		
-		return "good";
-	}
-	
-	@GetMapping("/board/filelist")
-	public void getFileList() {}
-	
-	//파일 다운로드
-	@GetMapping("/board/fileDownload")
-	public void fileDownload(@RequestParam("file") String file, HttpServletResponse rs) throws Exception {
-		
-		String path = "c:\\Repository\\test\\";
-		
-		byte fileByte[] = FileUtils.readFileToByteArray(new File(path+file));
-		
-		//헤드값을 Content-Disposition로 주게 되면 Response Body로 오는 값을 filename으로 다운받으라는 것임
-		//예) Content-Disposition: attachment; filename="hello.jpg"
-		rs.setContentType("application/octet-stream");
-		rs.setContentLength(fileByte.length);
-		rs.setHeader("Content-Disposition",  "attachment; filename=\""+URLEncoder.encode(file, "UTF-8")+"\";");
-		rs.getOutputStream().write(fileByte);
-		rs.getOutputStream().flush();//버퍼에 있는 내용을 write
-		rs.getOutputStream().close();
-		
-	}
-
 	
 }
