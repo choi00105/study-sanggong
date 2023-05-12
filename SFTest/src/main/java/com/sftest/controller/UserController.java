@@ -42,31 +42,61 @@ public class UserController {
 	@GetMapping("/user/login")
 	public void getLogin(Model model) {}
 	
+	@ResponseBody
 	@PostMapping("/user/login")
-	public String postLogIn(UserVO loginData,Model model,HttpSession session,
-			RedirectAttributes rttr) {
+	public String postLogIn(UserVO loginData, HttpSession session, @RequestParam("autologin") String autologin) {
+		System.out.println("=== POST /user/login");
+		System.out.println("autologin = " + autologin);
+		String authkey = "";
 		
-		//아이디 존재 여부 확인
-		if(service.idCheck(loginData.getUserid()) == 0) {
-			rttr.addFlashAttribute("message", "ID_NOT_FOUND");
-			return "redirect:/user/login";
+		//로그인 시 자동 로그인 체크할 경우 신규 authkey 등록
+		if(autologin.equals("NEW")) { 	 
+			authkey = UUID.randomUUID().toString().replaceAll("-", ""); 
+			loginData.setAuthkey(authkey);
+			System.out.println("authkey = " + authkey);
+			service.authkeyUpdate(loginData);	
 		}
 		
-		UserVO member = service.login(loginData.getUserid());
+		//authkey가 클라이언트에 쿠키로 존재할 경우 로그인 과정 없이 세션 생성 후 게시판 목록 페이지로 이동  
+		if(autologin.equals("PASS")) {
+			
+			UserVO userinfo = service.userinfoByAuthkey(loginData.getAuthkey());
+			if(userinfo != null) {
+				
+				//세션 생성
+				session.setMaxInactiveInterval(3600*7);
+				session.setAttribute("userid", userinfo.getUserid());
+				session.setAttribute("username", userinfo.getUsername());
+				session.setAttribute("role", userinfo.getRole());
+				
+				return "{\"message\":\"good\"}";
+			}else 
+				return "{\"message\":\"bad\"}";
+		}
+		
+		//아이디 존재 여부 확인 -> 없을 때
+		if(service.idCheck(loginData.getUserid()) == 0) {
+			return "{\"message\":\"ID_NOT_FOUND\"}";
+		}
+		// 아이디가 존재 하면 읽어온 userid로 로그인 정보 가져오기
+		UserVO member = service.userinfo(loginData.getUserid());
 		
 		//패스워드 확인
 		if(!pwdEncoder.matches(loginData.getPassword(),member.getPassword())) {
-			rttr.addFlashAttribute("message", "PASSWORD_NOT_FOUND");
-			return "redirect:/user/login";
-		}else {
-		
+			System.out.println("비번??");
+			return "{\"message\":\"PASSWORD_NOT_FOUND\"}";
+		}else { // 패스 워드가 존재 하면	
 			
-		//세션 생성
-		session.setMaxInactiveInterval(3600*7);
-		session.setAttribute("userid", loginData.getUserid());
-		session.setAttribute("username", member.getUsername());
-
-		return "redirect:/board/list?page=1";
+			System.out.println("아이디 비번 다 맞음");
+			//세션 생성
+			session.setMaxInactiveInterval(3600*7);
+			session.setAttribute("userid", member.getUserid());
+			session.setAttribute("username", member.getUsername());
+			session.setAttribute("roll", member.getRole());
+			
+			System.out.println(member);
+			System.out.println(member.toString());
+			return "{\"message\":\"good\",\"authkey\":\"" + authkey + "\"}";
 		}
 
 	}

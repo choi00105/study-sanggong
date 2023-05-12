@@ -117,5 +117,15 @@ public class UserVO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	@Override
+	public String toString() {
+		return "UserVO [userid=" + userid + ", username=" + username + ", password=" + password + ", gender=" + gender
+				+ ", hobby=" + hobby + ", job=" + job + ", description=" + description + ", zipcode=" + zipcode
+				+ ", address=" + address + ", telno=" + telno + ", email=" + email + ", authkey=" + authkey + ", role="
+				+ role + ", org_filename=" + org_filename + ", stored_filename=" + stored_filename + ", filesize="
+				+ filesize + "]";
+	}
+	
+	
 	
 }

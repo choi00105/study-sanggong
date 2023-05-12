@@ -5,60 +5,104 @@
 <head>
 <meta charset="UTF-8">
 <title>로그인</title>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 <script>
 
-	const cookieMaker = () => {
-	
-		document.cookie = 'userid=' + ${userid} + '; path=/; expires=Sun, 31 Dec 2023 23:59:59 GMT';
-		document.cookie = 'username=' + encodeURIComponent('${username}') + '; path=/; expires=Sun, 31 Dec 2023 23:59:59 GMT';		
-	
-	}	
-	
-	const getCookie = (name) => {
-	
-		const cookies = document.cookie.split(`; `).map((el) => el.split('='));
-		  let getItem = [];
-	
-		  for (let i = 0; i < cookies.length; i++) {
-		    
-		    if (cookies[i][0] === name) {
-		      getItem.push(cookies[i][1]);
-		      break;
-		    }
-		  }
-	
-		  if (getItem.length > 0) {
-			  console.log(getItem[0]);
-		    return decodeURIComponent(getItem[0]);
-		  }
+	window.onload = async () => {
+		// 쿠키값 가져오기
+		const getCookie = (name) => {
+			
+			const cookies = document.cookie.split(`; `).map((el) => el.split('='));
+			  let getItem = [];
+		
+			  for (let i = 0; i < cookies.length; i++) {
+			    if (cookies[i][0] === name) {
+			      getItem.push(cookies[i][1]);
+			      break;
+			    }
+			  }
+		
+			  if (getItem.length > 0) {
+				  console.log(getItem[0]);
+			    return decodeURIComponent(getItem[0]);
+			  }			
+		}
+		
+		let userid = getCookie('userid');
+		let password = getCookie('password');
+		let authkey = getCookie('authkey');
+		
+		// 로그인 화면 로드시 userid 체크박스 관리
+		if(userid !== undefined ) { // userid 라는 쿠키가 존재 
+			document.querySelector('#rememberUserid').checked = true;
+			document.querySelector('#userid').value = userid;
+		} else { // userid 쿠기 가 없다면
+			document.querySelector('#rememberUserid').checked = false;
+		}
+		
+		// 로그인 화면 로드시 password 체크박스 관리
+		if(password !== undefined ) { // password 라는 쿠키가 존재 
+			document.querySelector('#rememberPassword').checked = true;
+			// Base64로 인코딩 된 paswword 디코딩
+			const decrypt = CryptoJS.enc.Base64.parse(password);
+			const hashData = decrypt.toString(CryptoJS.enc.Utf8);
+			password = hashData;
+			
+			document.querySelector('#password').value = password;
+		} else { // 패스워드 쿠키가 존재하지 않을 경우
+			document.querySelector('#rememberPassword').checked = false;
+		}
+		
+		// login 하면 
+		
+		// 자동 로그인 처리
+		if(authkey !== undefined){
+			
+			let formData = new FormData();
+			formData.append("authkey", authkey);
+			await fetch('/user/login?autologin=PASS', {
+				method : 'POST',
+				body : formData
+			}).then((response) => response.json())
+			  .then((data) => {
+				 if(data.message == 'good'){				 
+					 document.location.href='/board/list?page=1';
+				} else {
+					alert("시스템 장애로 자동 로그인이 실패 했습니다.");		 
+				}		  
+		    }).catch((error)=> { 
+		    	console.log(error);
+		    	});
+		}
 		
 		
 	}
-	
-	const getCookieName = () => {
-		
-		const userid = getCookie("userid");
-		const username = getCookie("username");
-		
-		document.querySelector("#userid").innerHTML = userid;
-		document.querySelector("#username").innerHTML = username;
-		
+	// 자동 로그인 체크 관리
+	const checkRememberMe = () => {
+		if(document.querySelector('#rememberMe').checked){
+			document.querySelector('#rememberUserid').checked = false;
+			document.querySelector('#rememberPassword').checked = false;
+		}
 	}
 	
-	const deleteCookie = () => {
-		
-		document.cookie = 'userid=xavier; path=/; max-age=0';
-		document.cookie = 'username=' + encodeURIComponent("김현우") + '; path=/; max-age=0';
-		
-		document.querySelector("#userid").innerHTML = '';
-		document.querySelector("#username").innerHTML = '';
-		
+	// 아이디 체크 관리
+	const checkRememberUserid = () => {
+		if(document.querySelector('#rememberUserid').checked){
+			document.querySelector('#rememberMe').checked = false;
+			
+		}
 	}
 	
-	const loginCheck = () => {
-		
-		if(document.loginForm.userid.value == ''){
+	const checkRememberPassword = () => {
+		if(document.querySelector('#rememberPassword').checked){
+			document.querySelector('#rememberMe').checked = false;
+			
+		}
+	}
+	
+	const loginCheck = async () => {
+		/*
+		if(document.loginForm.userid.value == '' || userid.value === null){
 			alert("아이디를 입력하세요");
 			return false;
 		}
@@ -68,12 +112,80 @@
 		}
 		document.loginForm.action = '/user/login';
 		document.loginForm.submit();
+		*/
+		
+		// 아이디 유효성 검사
+		if(userid.value === '' || userid.value === null) {
+			alert("아이디를 입력하세요");
+			userid.focus();
+			return false;
+		}
+		
+		// 패스워드 유효성 검사
+		if(password.value === '' || password.value === null) {
+			alert("패스워드를 입력하세요");
+			password.focus();
+			return false;
+		}
+		
+		// 로그인 하면서 자동로그인 , 아이디 비번 저장 쿠키 설정
+		let formData = new FormData();
+		formData.append("userid", userid.value);
+		formData.append("password", password.value);
+		// NEW : 로그인 하면서 쿠키 새로 생성 ( 개발자가 정해준거)
+		// PASS : 이미 쿠키가 생성 되어 있는 상태에서 로그인
+		await fetch('/user/login?autologin=NEW',{
+			method: 'POST',
+			body: formData,
+			
+		})
+		.then((response)=> response.json())
+		.then((data) => {
+			if(data.message === 'good') {
+				cookieManage(userid.value, password.value, data.authkey);
+				document.location.href='/board/list?page=1';
+			} else if(data.message === 'ID_NOT_FOUND') {
+				msg.innerHTML = '존재하지 않는 아이디 입니다.';
+			} else if(data.message === 'PASSWORD_NOT_FOUND') {
+				msg.innerHTML = '잘못된 패스워드 입니다.';
+			} else {
+				alert('시스템 장애로 로그인이 실패 했습니다.');
+			}
+		}).catch((error) => {
+			console.log(error);
+		});
+		
 	}
 	
 	const press = () =>{
 		
 		if(event.keyCode == 13){loginCheck();}
+	}
+	
+	// 쿠키 관리 : 쿠키생성, 쿠키 삭제
+	const cookieManage = (userid, password, authkey) => {
+		// 자동 로그인 쿠키 관리
+		if(rememberMe.checked)
+			document.cookie = 'authkey=' + authkey + '; path=/; expires=Sun, 31 Dec 2023 23:59:59 GMT'; 
+		else
+			document.cookie = 'authkey=' + authkey + '; path=/; max-age=0';
+			
+		// userid 쿠키 관리
+		if(rememberUserid.checked)
+			document.cookie = 'userid=' + userid + '; path=/; expires=Sun, 31 Dec 2023 23:59:59 GMT'; 
+		else
+			document.cookie = 'userid=' + userid + '; path=/; max-age=0';
+			
+		// password 쿠키 관리
+		//Base64(양방향 복호화 64bit 알고리즘) 
+		const key = CryptoJS.enc.Utf8.parse(password);
+		const base64 = CryptoJS.enc.Base64.stringify(key);
+		password = base64;
 		
+		if(rememberPassword.checked)
+			document.cookie = 'password=' + password + '; path=/; expires=Sun, 31 Dec 2023 23:59:59 GMT'; 
+		else
+			document.cookie = 'password=' + password + '; path=/; max-age=0';
 	}
 
 </script>
@@ -152,13 +264,11 @@ a:active { color: red; }
 
 			<input type="text" name="userid" id="userid" class="userid" placeholder="아이디를 입력하세요.">
          	<input type="password" id="password" name="password" class="userpasswd" onkeydown="press(this.form)" placeholder="비밀번호를 입력하세요.">
+         	<p id="msg" style="color:red; text-align: center;"></p>
          	<br>
-         	<c:if test="${message == 'ID_NOT_FOUND' }">
-         		<p style="color:red;text-align:center;">존재하지 않는 아이디입니다.</p> 
-         	</c:if>
-         	<c:if test="${message == 'PASSWORD_NOT_FOUND' }">
-         		<p style="color:red;text-align:center;">잘못된 패스워드입니다.</p> 
-         	</c:if>
+         	<label><input type="checkbox" id="rememberUserid" onclick="checkRememberUserid()">아이디 기억</label>
+         	<label><input type="checkbox" id="rememberPassword" onclick="checkRememberPassword()">패스워드 기억</label>
+         	<label><input type="checkbox" id="rememberMe" onclick="checkRememberMe()">자동 로그인</label>
          	<br><br>
      		<input type="button" id="btn_login" class="login_btn" value="로그인" onclick="loginCheck()"> 
 		</form>

@@ -16,6 +16,15 @@ public interface UserService {
 	//사용자등록
 	public void signup(UserVO user);
 	
+	//사용자 자동 로그인을 위한 authkey 등록
+	public void authkeyUpdate(UserVO user);
+	
+	//사용자 자동 로그인을 위한 authkey로 사용자 정보 가져 오기 
+	public UserVO userinfoByAuthkey(String authkey);
+	
+	//사용자 정보 보기
+	public UserVO userinfo(String userid);
+	
 	//주소 전체 갯수 계산
 	public int addrTotalCount(String addrSearch);
 

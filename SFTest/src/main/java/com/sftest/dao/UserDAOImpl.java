@@ -36,7 +36,24 @@ public class UserDAOImpl implements UserDAO {
 		sql.insert(namespace + ".signup", user);		
 	}
 
+	//사용자 자동 로그인을 위한 authkey 등록
+	@Override
+	public void authkeyUpdate(UserVO user) {
+		sql.update(namespace + ".authkeyUpdate", user);
+	}
 	
+	//사용자 자동 로그인을 위한 authkey로 사용자 정보 가져 오기 
+	@Override
+	public UserVO userinfoByAuthkey(String authkey) {
+		return sql.selectOne(namespace + ".userinfoByAuthkey", authkey);
+	}
+	
+	//사용자 정보 보기
+	@Override
+	public UserVO userinfo(String userid) {
+		return sql.selectOne(namespace + ".userinfo", userid);
+	}
+		
 	//주소 전체 갯수 계산
 	@Override
 	public int addrTotalCount(String addrSearch) {

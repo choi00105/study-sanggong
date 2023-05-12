@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.SFTest.dao.UserDAO;
 import com.SFTest.dto.AddressVO;
-
 import com.SFTest.dto.UserVO;
 
 @Service
@@ -32,6 +31,24 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void signup(UserVO user) {
 		dao.signup(user);		
+	}
+	
+	//사용자 자동 로그인을 위한 authkey 등록
+	@Override
+	public void authkeyUpdate(UserVO user) {
+		dao.authkeyUpdate(user);
+	}
+	
+	//사용자 자동 로그인을 위한 authkey로 사용자 정보 가져 오기 
+	@Override
+	public UserVO userinfoByAuthkey(String authkey) {
+		return dao.userinfoByAuthkey(authkey);
+	}
+	
+	//사용자 정보 보기
+	@Override
+	public UserVO userinfo(String userid) {
+		return dao.userinfo(userid);
 	}
 	
 	//주소 전체 갯수 계산

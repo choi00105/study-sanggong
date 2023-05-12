@@ -35,6 +35,36 @@
 		
 	}
 	
+	const logout = () => {
+		if(confirm('로그아웃 하시겠습니까?')) {
+			let authkey = getCookie('authkey');
+			if(authkey !== undefined)
+				document.cookie = 'authkey=' + authkey + '; path=/; max-age=0';
+				// document.cookie = 'path=/; max-age=0';
+			document.location.href='/user/logout';
+		}
+	}
+	
+	const getCookie = (name) => {
+		
+		const cookies = document.cookie.split(`; `).map((el) => el.split('='));
+		  let getItem = [];
+	
+		  for (let i = 0; i < cookies.length; i++) {
+		    
+		    if (cookies[i][0] === name) {
+		      getItem.push(cookies[i][1]);
+		      break;
+		    }
+		  }
+	
+		  if (getItem.length > 0) {
+			  console.log(getItem[0]);
+		    return decodeURIComponent(getItem[0]);
+		  }			
+	}
+	
+	
 	const press = () => {
 		if(event.keyCode==13) search();
 	}
@@ -99,7 +129,7 @@
 		<a href="/board/list?page=1">처음으로</a>&nbsp;&nbsp;
 		<a href="/board/write">글쓰기</a>&nbsp;&nbsp;
 		<a href="/user/userinfo">사용자관리</a>&nbsp;&nbsp;
-		<a href="/user/logout">로그아웃</a>		
+		<a href="javascript:logout()">로그아웃</a>		
 	</div>
 	<br><br>
 	

@@ -11,9 +11,18 @@
 	
 	<!-- 로그인 정보 가져 오기 -->
 	<select id="login" parameterType="string" resultType="com.SFTest.dto.UserVO">
-		select password,username from tbl_user where userid = #{userid}
+		select * from tbl_user where userid = #{userid}
 	</select>
 	
+	<!-- 사용자 자동 로그인을 위한 authkey 등록 -->
+	<update id="authkeyUpdate" parameterType="com.SFTest.dto.UserVO">
+		update tbl_user set authkey = #{authkey} where userid = #{userid}
+	</update>
+	
+	<!-- 사용자 자동 로그인을 위한 authkey로 사용자 정보 가져 오기  -->
+	<select id="userinfoByAuthkey" parameterType="string" resultType="com.SFTest.dto.UserVO">
+		select * from tbl_user where authkey = #{authkey}
+	</select>
 	
 	<!-- 사용자 등록 -->
 	<insert id="signup" parameterType="com.SFTest.dto.UserVO">
@@ -21,6 +30,10 @@
 		 (#{userid},#{username},#{password},#{gender},#{hobby},#{job},#{description}, #{zipcode}, #{address}, #{telno}, #{email}, #{role}, #{org_filename}, #{stored_filename}, #{filesize})
 	</insert>
 	
+	<!-- 사용자 정보 보기 -->
+	<select id="userinfo" parameterType="string" resultType="com.SFTest.dto.UserVO">
+		select * from tbl_user where userid = #{userid}
+	</select>
 	
 	<!-- 우편번호 행 최대 갯수 계산 -->
 	<select id="addrTotalCount" parameterType="string" resultType="int">
