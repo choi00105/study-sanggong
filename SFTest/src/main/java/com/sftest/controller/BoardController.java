@@ -92,7 +92,7 @@ public class BoardController {
 		String path = "c:\\Repository\\file\\"; 
 		int seqno =0;
 		
-		if(kind.equals("U")) {
+		if(kind.equals("U")) { // 게시물 수정 시 게시물 수정
 			seqno = board.getSeqno();
 			service.modify(board);
 			
@@ -103,17 +103,21 @@ public class BoardController {
 					//파일 삭제
 					FileVO fileInfo = new FileVO();
 					fileInfo = service.fileInfo(deleteFileList[i]);
-					File file = new File(path + fileInfo.getStored_filename());
-					file.delete();
+					//File file = new File(path + fileInfo.getStored_filename());
+					//file.delete();
 					
 					//파일 테이블에서 파일 정보 삭제
-					service.deleteFileList(deleteFileList[i]);
+					// 게시물 수정에서 삭제할 파일 목록이 전송되면 이 값으 받아서 tbl_file내에 있는 정보를 하나씩 삭제하는 deleteFileList
+					Map<String, Object> data = new HashMap<>();
+					data.put("kind", "F");
+					data.put("fileseqno", dataFileList[i]);
+					service.deleteFileList(deleteFileList[i]); // deleteFileList는 Map타입의 인자값을 받도록 설정
 					
 				}
 			}	
 		}
 		
-		if(!multipartFile.isEmpty()) {
+		if(!multipartFile.isEmpty()) { // 파일 등록 및 수정 시 파일 업로드
 			File targetFile = null; 
 			Map<String,Object> fileInfo = null;		
 			
@@ -133,11 +137,12 @@ public class BoardController {
 				fileInfo.put("filesize", filesize);
 				fileInfo.put("seqno", seqno);
 				fileInfo.put("userid", board.getUserid());
+				fileInfo.put("kind", kind);
 				service.fileInfoRegistry(fileInfo);
 	
 			}
 		}
-		if(kind.equals("I")) { 
+		if(kind.equals("I")) { // 게시물 등록시 파일 업로드
 			service.write(board);
 		}
 	}	
@@ -236,18 +241,20 @@ public class BoardController {
 	public void getModify(@RequestParam("seqno") int seqno, @RequestParam("page") int pageNum, Model model,
 			@RequestParam(name="keyword",defaultValue="",required=false) String keyword
 			) throws Exception{ 
-		System.out.println("===GET /board/modify");
+		System.out.println("===GET /board/modify keyword? : "+ keyword);
 		//model.addAttribute("view", mapper.view(seqno));
 		model.addAttribute("view", service.view(seqno));
 		model.addAttribute("page", pageNum);
-		model.addAttribute("keyword", keyword);		
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("fileListView", service.fileListView(seqno));
 		
 	}
 	
 	//게시물 수정
 	@PostMapping("/board/modify")
 	public String postModify(BoardVO board,@RequestParam("page") int pageNum,
-			@RequestParam(name="keyword",defaultValue="",required=false) String keyword
+			@RequestParam(name="keyword",defaultValue="",required=false) String keyword, // 뭔가 빠진듯?
+			@RequestParam(name="deleteFileList", required=false) int[] deleteFileList
 			) throws Exception {
 		System.out.println("===POST /board/modify --> redirect:/board/view?seqno=번호&page=페이지번호&keyword=키워드");
 		//mapper.modify(board);
@@ -260,38 +267,36 @@ public class BoardController {
 	//게시물 삭제
 	@GetMapping("/board/delete")
 	public String getDelete(@RequestParam("seqno") int seqno) throws Exception {
+		
 		System.out.println("===GET  /board/delete --> redirect:/board/list?page=1");
-		/*BoardVO board = mapper.view(seqno);
-		if(!board.getStored_filename().isEmpty()) {
-			File file = new File("c:\\Repository\\test\\" + board.getStored_filename());
-			file.delete();
-		}
-		*/
-		//mapper.delete(seqno);
+		
+		Map<String, Object> data = new HashMap<>();
+		data.put("kind", "B"); // 게시물 삭제시 tbl_file 내의 파일 정보 수정
+		data.put("seqno", seqno);
+		service.deleteFileList(data);
 		service.delete(seqno);
 		return "redirect:/board/list?page=1";
 	}
 	
 	//파일 다운로드
 	@GetMapping("/board/filedownload")
-	public void filedownload(@RequestParam("seqno") int seqno, HttpServletResponse rs) throws Exception {
+	public void filedownload(@RequestParam("fileseqno") int fileseqno, HttpServletResponse rs) throws Exception {
 		System.out.println("===GET  /board/filedownload");
-		String path = "c:\\Repository\\test\\";
+		String path = "c:\\Repository\\file\\";
 		
 		//BoardVO board = mapper.view(seqno);
-		BoardVO board = service.view(seqno);
+		FileVO fileInfo = service.fileInfo(fileseqno);
 		
-		byte fileByte[] = FileUtils.readFileToByteArray(new File(path+board.getStored_filename()));
+		byte fileByte[] = FileUtils.readFileToByteArray(new File(path+fileInfo.getStored_filename()));
 		
 		//헤드값을 Content-Disposition로 주게 되면 Response Body로 오는 값을 filename으로 다운받으라는 것임
 		//예) Content-Disposition: attachment; filename="hello.jpg"
 		rs.setContentType("application/octet-stream");
 		rs.setContentLength(fileByte.length);
-		rs.setHeader("Content-Disposition",  "attachment; filename=\""+URLEncoder.encode(board.getOrg_filename(), "UTF-8")+"\";");
+		rs.setHeader("Content-Disposition",  "attachment; filename=\""+URLEncoder.encode(fileInfo.getOrg_filename(), "UTF-8")+"\";");
 		rs.getOutputStream().write(fileByte);
 		rs.getOutputStream().flush();//버퍼에 있는 내용을 write
 		rs.getOutputStream().close();
-		
 	}
 
 	//댓글 처리

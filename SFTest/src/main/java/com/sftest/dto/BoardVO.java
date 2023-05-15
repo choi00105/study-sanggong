@@ -9,9 +9,6 @@ public class BoardVO {
     private String title;
     private String regdate;
     private String content;
-    private String org_filename;
-    private String stored_filename;
-    private long filesize; 
     private int hitno;
     private int likecnt;
     private int dislikecnt;
@@ -65,24 +62,6 @@ public class BoardVO {
 	public void setHitno(int hitno) {
 		this.hitno = hitno;
 	}
-	public String getOrg_filename() {
-		return org_filename;
-	}
-	public void setOrg_filename(String org_filename) {
-		this.org_filename = org_filename;
-	}
-	public String getStored_filename() {
-		return stored_filename;
-	}
-	public void setStored_filename(String stored_filename) {
-		this.stored_filename = stored_filename;
-	}
-	public long getFilesize() {
-		return filesize;
-	}
-	public void setFilesize(long filesize) {
-		this.filesize = filesize;
-	}  
 	
 	public int getLikecnt() {
 		return likecnt;

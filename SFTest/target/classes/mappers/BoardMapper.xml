@@ -22,28 +22,47 @@
 
 <!-- 게시물 등록 -->
 <insert id="write" parameterType="com.SFTest.dto.BoardVO">
-	insert into tbl_board (userid,writer,title,content,org_filename,stored_filename,filesize) values 
-	(#{userid},#{writer},#{title},#{content},#{org_filename},#{stored_filename},#{filesize})
+	insert into tbl_board (userid,writer,title,content,) values 
+	(#{userid},#{writer},#{title},#{content})
 </insert>
 
 
 <!-- 파일 업로드 정보 등록 -->
 <insert id="fileInfoRegistry" parameterType="HashMap">
-    insert into tbl_file (seqno,userid,org_filename,stored_filename,filesize,checkfile) 
-    values (
+    insert into tbl_file (seqno, userid, org_filename,stored_filename,filesize,checkfile)
+    <choose>
+    	<when test='kind.equals("I")'>
+    		values (
         (select auto_increment from information_schema.tables where table_name = 'tbl_board'
         and table_schema = DATABASE()), #{userid}, #{org_filename}, #{stored_filename}, #{filesize}, 'Y')
+    	</when>
+    	<when test='kind.equals("I")'>
+    		values (#{seqno}, #{userid}, #{org_filename}, #{stored_filename}, #{filesize}, 'Y')
+    	</when>
+    </choose>
 </insert>
-
 
 <!-- 다운로드를 위한 파일 정보 가져오기 -->
 <select id="fileInfo" parameterType="int" resultType="com.SFTest.dto.FileVO">
 	select org_filename, stored_filename from tbl_file where fileseqno = #{fileseqno}
 </select>
 
-<!-- 게시물 수정에서 파일 삭제 -->
-<update id="deleteFileList" parameterType="int">
-	update tbl_file set checkfile where fileseqno = #{fileseqno}
+<!-- 게시물 내용 보기에서 업로드 된 파일 목록 보기 -->
+<select id="fileListView" parameterType="int" resultType="com.SFTest.dto.FileVO">
+	select fileseqno, org_filename, filesize from tbl_file where seqno = #{seqno} and checkfile='Y'
+</select>
+
+<!-- 게시물 수정에서 파일 정보 삭제 -->
+<update id="deleteFileList" parameterType="HashMap">
+	update tbl_file set checkfile = 'N' where 
+	<choose>
+		<when test='kind.equals("F")'>
+			fileseqno = #{fileseqno}
+		</when>
+		<when test='kind.equals("B")'>
+			seqno = #{seqno}
+		</when>
+	</choose>
 </update>
 
 <!-- 게시물 삭제를 위한 파일 목록 가져 오기 -->
@@ -52,10 +71,11 @@
 </select>
 
 
+
 <!-- 게시물 상세 보기 -->
 <select id="view" parameterType="int" resultType="com.SFTest.dto.BoardVO">
 	select seqno,writer,userid,title,to_char(regdate,'YYYY-MM-DD HH24:MI:SS') as regdate,
-		content,org_filename,stored_filename,filesize, likecnt, dislikecnt from tbl_board where seqno = #{seqno}
+		content, likecnt, dislikecnt from tbl_board where seqno = #{seqno}
 </select>
 
 <!-- 게시물 이전 보기 -->
