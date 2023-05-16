@@ -1,5 +1,6 @@
 package com.SFTest.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -81,4 +82,5 @@ public interface BoardDAO {
 	//댓글 삭제
 	public void replyDelete(ReplyVO reply) throws Exception;
 	
+		
 }

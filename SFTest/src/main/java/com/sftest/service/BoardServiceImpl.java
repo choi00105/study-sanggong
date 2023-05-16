@@ -153,5 +153,8 @@ public class BoardServiceImpl implements BoardService {
 	public void replyDelete(ReplyVO reply) throws Exception{
 		dao.replyDelete(reply);
 	}
+	
+	
+	
 
 }

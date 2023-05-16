@@ -1,5 +1,6 @@
 package com.SFTest.dao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -175,5 +176,5 @@ public class BoardDAOImpl implements BoardDAO {
 	public void replyDelete(ReplyVO reply) throws Exception{
 		sql.delete(namespace + ".replyDelete", reply);
 	}
-
+		
 }

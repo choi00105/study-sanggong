@@ -129,6 +129,9 @@
 		<a href="/board/list?page=1">처음으로</a>&nbsp;&nbsp;
 		<a href="/board/write">글쓰기</a>&nbsp;&nbsp;
 		<a href="/user/userinfo">사용자관리</a>&nbsp;&nbsp;
+		<c:if test="${role == 'MASTER'}">
+			<a href="/master/sysmanager">시스템관리</a>&nbsp;&nbsp;
+		</c:if>
 		<a href="javascript:logout()">로그아웃</a>		
 	</div>
 	<br><br>

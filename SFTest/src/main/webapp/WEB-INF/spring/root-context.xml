@@ -17,13 +17,30 @@
 		<property name="maxInMemorySize" value="104857600" />
 	</bean> 
 		
+	
+	<!-- HikariCP Bean 설정 -->
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig"> 
+			<property name="idleTimeout" value="30000" />
+			<property name="connectionTimeout" value="3000" /> 
+			<property name="maxLifetime" value="400000" />
+			<property name="maximumPoolSize" value="300" /> 
+			<property name="minimumIdle" value="20" />
+			<property name="driverClassName" value="org.mariadb.jdbc.Driver" />
+			<property name="jdbcUrl" value="jdbc:mariadb://localhost:3306/testdev" />
+ 			<property name="username" value="webmaster" /> 
+			<property name="password" value="12345" /> 
+			<property name="poolName" value="Oracle_21C_XE-BOARD" />		
+	</bean>	
+	
 	<!-- mybatis 설정 -->	
+	<!-- 
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="org.mariadb.jdbc.Driver" />
 		<property name="url" value="jdbc:mariadb://localhost:3306/testdev" />
 		<property name="username" value="webmaster" />
 		<property name="password" value="12345" />
 	</bean>
+	 -->
 	
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />

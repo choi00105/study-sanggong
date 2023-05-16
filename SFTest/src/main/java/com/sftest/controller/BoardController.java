@@ -49,6 +49,11 @@ public class BoardController {
 	@Autowired
 	BoardService service; //의존성 주입
 	
+	// 홈페이지 가게
+	@GetMapping("/")
+	public String getHome() {
+		return "home";
+	}
 	//게시물 목록 보기
 	@GetMapping("/board/list")
 	public void getList(@RequestParam("page") int pageNum, @RequestParam(name="keyword",defaultValue="",required=false) String keyword, Model model) throws Exception{
@@ -75,18 +80,18 @@ public class BoardController {
 	//첨부 파일 없는 게시물 등록
 	@ResponseBody
 	@PostMapping("/board/write")
-	public void PostWrite(BoardVO board) throws Exception{
+	public String PostWrite(BoardVO board) throws Exception{
 		System.out.println("===GET /board/write");
 		//int seqno = service.getSeqnoWithNextval();
 		//board.setSeqno(seqno);
 		service.write(board);		
-
+		return "{\"message\":\"good\"}";
 	}
 		
 	//파일 업로드
 	@ResponseBody
 	@PostMapping("/board/fileUpload")
-	public void postFileUpload(BoardVO board,@RequestParam("SendToFileList") List<MultipartFile> multipartFile, 
+	public String postFileUpload(BoardVO board,@RequestParam("SendToFileList") List<MultipartFile> multipartFile, 
 			@RequestParam("kind") String kind,@RequestParam(name="deleteFileList", required=false) int[] deleteFileList) throws Exception{
 
 		String path = "c:\\Repository\\file\\"; 
@@ -110,7 +115,7 @@ public class BoardController {
 					// 게시물 수정에서 삭제할 파일 목록이 전송되면 이 값으 받아서 tbl_file내에 있는 정보를 하나씩 삭제하는 deleteFileList
 					Map<String, Object> data = new HashMap<>();
 					data.put("kind", "F");
-					data.put("fileseqno", dataFileList[i]);
+					data.put("fileseqno", deleteFileList[i]);
 					service.deleteFileList(deleteFileList[i]); // deleteFileList는 Map타입의 인자값을 받도록 설정
 					
 				}
@@ -145,6 +150,7 @@ public class BoardController {
 		if(kind.equals("I")) { // 게시물 등록시 파일 업로드
 			service.write(board);
 		}
+		return "{\"message\":\"good\"}";
 	}	
 	//게시물 내용 상세 보기 
 	@GetMapping("/board/view")

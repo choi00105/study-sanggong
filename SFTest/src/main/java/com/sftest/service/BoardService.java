@@ -1,6 +1,5 @@
 package com.SFTest.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -80,8 +79,6 @@ public interface BoardService {
 	//댓글 삭제
 	public void replyDelete(ReplyVO reply) throws Exception;
 	
-	// 파일 데이터 삭제로
-	public void dataFileList(ArrayList<Integer> deleteFileList);
 	
 }
 

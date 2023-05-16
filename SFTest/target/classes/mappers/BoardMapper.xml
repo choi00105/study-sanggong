@@ -22,7 +22,7 @@
 
 <!-- 게시물 등록 -->
 <insert id="write" parameterType="com.SFTest.dto.BoardVO">
-	insert into tbl_board (userid,writer,title,content,) values 
+	insert into tbl_board (userid,writer,title,content) values 
 	(#{userid},#{writer},#{title},#{content})
 </insert>
 
@@ -32,11 +32,10 @@
     insert into tbl_file (seqno, userid, org_filename,stored_filename,filesize,checkfile)
     <choose>
     	<when test='kind.equals("I")'>
-    		values (
-        (select auto_increment from information_schema.tables where table_name = 'tbl_board'
+    		values ((select auto_increment from information_schema.tables where table_name = 'tbl_board'
         and table_schema = DATABASE()), #{userid}, #{org_filename}, #{stored_filename}, #{filesize}, 'Y')
     	</when>
-    	<when test='kind.equals("I")'>
+    	<when test='kind.equals("U")'>
     		values (#{seqno}, #{userid}, #{org_filename}, #{stored_filename}, #{filesize}, 'Y')
     	</when>
     </choose>

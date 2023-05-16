@@ -118,6 +118,13 @@
 		</dependency>
 
 		<!-- DBMS 연결 시작 -->
+		
+		<!-- HikariCP 설치 -->
+		<dependency>
+    		<groupId>com.zaxxer</groupId>
+    		<artifactId>HikariCP</artifactId>
+    		<version>5.0.1</version>
+		</dependency>
 		<!-- mariadb JDBC 설정 -->
 		<dependency>
     		<groupId>org.mariadb.jdbc</groupId>
