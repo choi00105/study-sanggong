@@ -135,7 +135,7 @@ const IterationSample = () => {
   const [inputText, setInputText] = useState('');
   const [nextId, setnextId] = useState('');
   // map 함수 : 자동으로 for문을 돌려서 k 와 v 를 반환
-  // react 에서는 반복을 통해서 엘레멘트를 출력할 경우 반드시 키 값이 있어야 함
+  // react 에서는 반복을 통해서 엘레멘트를 출력할 경우 엘레멘트 속성에 반드시 키 값이 있어야 함
   const onRemove = (id) => {
     const nextNames = names.filter((name) => name.id !== id);
     setNames(nextNames);
