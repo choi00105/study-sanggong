@@ -2,7 +2,9 @@ package com.board.controller;
 
 import java.io.File;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,8 +67,8 @@ public class BoardController {
 	@PostMapping("/board/write")
 	public String PostWrite(BoardVO board) throws Exception{
 
-		//int seqno = service.getSeqnoWithNextval();
-		//board.setSeqno(seqno);
+		int seqno = service.getSeqnoWithNextval();
+		board.setSeqno(seqno);
 		service.write(board);
 		return "{\"message\":\"good\"}";
 
@@ -81,6 +83,11 @@ public class BoardController {
 		String path = "c:\\Repository\\file\\"; 
 		int seqno =0;
 		
+		if(kind.equals("I")) { //게시물 등록 시 게시물 등록 
+			seqno = service.getSeqnoWithNextval();
+			board.setSeqno(seqno);
+			service.write(board);
+		}
 		if(kind.equals("U")) { //게시물 수정 시 게시물 수정
 			seqno = board.getSeqno();
 			service.modify(board);
@@ -132,9 +139,7 @@ public class BoardController {
 			}
 		}	
 
-		if(kind.equals("I")) { //게시물 등록 시 게시물 등록 
-			service.write(board);
-		}
+		
 		
 		return "{\"message\":\"good\"}";
 }
@@ -181,11 +186,12 @@ public class BoardController {
 	@ResponseBody
 	@PostMapping(value = "/board/likeCheck")
 	public String postLikeCheck(@RequestBody Map<String, Object> likeCheckData) throws Exception {
-		
+		System.out.println(" === post  /board/likeCheck     seqno : " + likeCheckData.get("seqno"));
 		int seqno = (int)likeCheckData.get("seqno");
 		String userid = (String)likeCheckData.get("userid");
 		int checkCnt = (int)likeCheckData.get("checkCnt");
 
+		
 		//현재 날짜, 시간 구해서 좋아요/싫어요 한 날짜/시간 입력 및 수정
 		String likeDate = "";
 		String dislikeDate = "";
@@ -229,25 +235,29 @@ public class BoardController {
 			) throws Exception{ 
 		
 		//model.addAttribute("view", mapper.view(seqno));
-		
+		System.out.println(" === GET   /board/modify");
 		System.out.println("keyword=" + keyword);
 		model.addAttribute("view", service.view(seqno));
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);	
 		model.addAttribute("fileListView", service.fileListView(seqno));
+		//model.addAttribute("message", 'good');	
+		System.out.println(model.toString());
+		
 		
 	}
 	
 	//게시물 수정
+	@ResponseBody
 	@PostMapping("/board/modify")
 	public String postModify(BoardVO board,@RequestParam("page") int pageNum,
 			@RequestParam(name="keyword", required=false) String keyword,
 			@RequestParam(name="deleteFileList", required=false) int[] deleteFileList) throws Exception {
-	
+		System.out.println(" ===  POST   /board/modify" +  LocalTime.now() );
 		service.modify(board);
 		
 		if(deleteFileList != null) {
-			
+			System.out.println("파일 정보 삭제");
 			for(int i=0; i<deleteFileList.length; i++) {
 
 				//파일 정보 삭제
@@ -264,8 +274,9 @@ public class BoardController {
 				
 			}
 		}
-		
-		return "redirect:/board/view?seqno=" + board.getSeqno() + "&page=" + pageNum+ "&keyword=" + URLEncoder.encode(keyword, "UTF-8");
+		System.out.println("수정 다 돌음");
+		//return "redirect:/board/view?seqno=" + board.getSeqno() + "&page=" + pageNum+ "&keyword=" + URLEncoder.encode(keyword, "UTF-8");
+		return "{\"message\":\"good\"}";
 	}
 	
 	//게시물 삭제

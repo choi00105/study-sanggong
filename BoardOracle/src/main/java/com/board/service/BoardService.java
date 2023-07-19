@@ -11,10 +11,13 @@ import com.board.dto.ReplyVO;
 public interface BoardService {
 
 	//게시물 목록 보기
-	public List<BoardVO> list(int startPoint,int postNum, String keyword);
+	public List<BoardVO> list(int startPoint, int endPoint, String keyword);
 	
 	//게시물 전체 갯수 계산
 	public int getTotalCount(String keyword);
+	
+	//게시물 번호 구하기
+	public int getSeqnoWithNextval();
 	
 	//게시물 등록
 	public void write(BoardVO board);

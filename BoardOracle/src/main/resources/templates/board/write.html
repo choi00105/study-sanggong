@@ -341,18 +341,13 @@ a:active { color: red; }
 
 </head>   
 <body>
-
-<%
-
-	String userid = (String)session.getAttribute("userid");
-	String username = (String)session.getAttribute("username");
-	String role = (String)session.getAttribute("role");
-	if(userid == null) response.sendRedirect("/");
-
-%>
-
+<script>
+	const userid = '[[${session.userid}]]';
+	if(userid == '')
+		document.location.href='/user/login';
+</script>
   	<div>
-    	<img id="topBanner" src ="/resources/images/logo.jpg" title="서울기술교육센터" >
+    	<img id="topBanner" src ="/images/logo.jpg" title="서울기술교육센터" >
   	</div>
 	<div class="main">
 		<div class="WriteDiv">
@@ -360,10 +355,10 @@ a:active { color: red; }
 			<br>
 			
 			<form id="WriteForm" method="POST">
-				<input type="text" class="writer" value="작성자 : <%=username %> 님" disabled>
+				<input type="text" class="writer" th:value="${session.username}" disabled>
 				<input type="text" class="title" id="title" name="title"  placeholder="여기에 제목을 입력하세요">
-				<input type="hidden" id="writer" name="writer" value="<%=username %>">
-				<input type="hidden" class="userid" id="userid" name="userid" value="<%=userid %>">
+				<input type="hidden" id="writer" name="writer" th:value="${session.username}">
+				<input type="hidden" class="userid" id="userid" name="userid" th:value="${session.userid}">
 				<textarea class="content" id="content" cols="100" rows="500" name="content" placeholder="여기에 내용을 입력하세요"></textarea>
 	
 				<div class="fileuploadForm">

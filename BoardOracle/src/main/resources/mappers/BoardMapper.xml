@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.board.mappers.Board">
+<mapper namespace="com.board.mapper.BoardMapper">
 
 <!-- 게시물 목록 보기 --> 
 <select id="list" parameterType="HashMap" resultType="com.board.dto.BoardVO">
@@ -16,28 +16,25 @@
 
 <!-- 전체 게시물 갯수 계산 -->
 <select id="getTotalCount" parameterType="string" resultType="int">
-	select count(*) from tbl_board 
-		where writer like concat('%',#{keyword},'%') or title like concat('%',#{keyword},'%') or
-			content like concat('%',#{keyword},'%') 
+	SELECT count(*) FROM tbl_board
+	WHERE writer LIKE '%' || #{keyword} || '%' OR title LIKE '%' || #{keyword} || '%' OR
+		content LIKE '%' || #{keyword} || '%'
+</select>
+
+<!-- 게시물 번호 구하기 -->
+<select id="getSeqnoWithNextval" resultType="int">
+	select tbl_board_seq.nextval as seqno from dual 
 </select>
 
 <!-- 게시물 등록 -->
 <insert id="write" parameterType="com.board.dto.BoardVO">
-	insert into tbl_board (userid,writer,title,content) values (#{userid},#{writer},#{title},#{content})
+	insert into tbl_board (seqno, userid,writer,title,content, regdate) values (#{seqno},#{userid},#{writer},#{title},#{content},sysdate)
 </insert>
 
 <!-- 파일 업로드 정보 등록 -->
 <insert id="fileInfoRegistry" parameterType="HashMap">
-	insert into tbl_file (seqno,userid,org_filename,stored_filename,filesize,checkfile) 
-	<choose>
-		<when test='kind.equals("I")'>
-			values ((select auto_increment from information_schema.tables where table_name = 'tbl_board' 
-		   and table_schema = DATABASE()),#{userid},#{org_filename},#{stored_filename},#{filesize},'Y')
-		</when>
-		<when test='kind.equals("U")'>	
-			values (#{seqno},#{userid},#{org_filename},#{stored_filename},#{filesize},'Y')
-		</when>   
-	</choose>		   
+	insert into tbl_file (fileseqno, seqno,userid,org_filename,stored_filename,filesize,checkfile) 
+		values (tbl_file_seq.nextval,#{seqno},#{userid},#{org_filename},#{stored_filename},#{filesize},'Y')   
 </insert>
 
 <!-- 다운로드를 위한 파일 정보 가져오기 -->
@@ -78,25 +75,24 @@
 <!-- 게시물 이전 보기 -->
 <select id="pre_seqno" parameterType="HashMap" resultType="int">
 	<![CDATA[
-	select ifnull(max(seqno),0) from tbl_board where seqno < #{seqno} and 
-		(writer like concat('%',#{keyword},'%') or title like concat('%',#{keyword},'%') or
-			content like concat('%',#{keyword},'%'))
+	select nvl(max(seqno),0) from tbl_board where seqno < #{seqno} and 
+		(writer like '%'||#{keyword}||'%' or title like '%'||#{keyword}||'%' or
+			content like '%'||#{keyword}||'%')
 	]]>		 
 </select>
 
 <!-- 게시물 다음 보기 -->
-
 <select id="next_seqno" parameterType="HashMap" resultType="int">
 	<![CDATA[
-	select ifnull(min(seqno),0) from tbl_board where seqno > #{seqno} and 
-		(writer like concat('%',#{keyword},'%') or title like concat('%',#{keyword},'%') or
-			content like concat('%',#{keyword},'%'))
-	]]>				 	
+	SELECT NVL(MIN(seqno), 0) FROM tbl_board WHERE seqno > #{seqno} AND 
+		(writer LIKE '%' || #{keyword} || '%' OR title LIKE '%' || #{keyword} || '%' OR
+			content LIKE '%' || #{keyword} || '%')
+	]]>
 </select>
 
 <!-- 조회수 업데이트 -->
 <update id="hitno" parameterType="com.board.dto.BoardVO">
-	update tbl_board set hitno = (select hitno from tbl_board where seqno=#{seqno}) + 1 where seqno=#{seqno}
+	update tbl_board set hitno = (select nvl(hitno,0) from tbl_board where seqno=#{seqno}) + 1 where seqno=#{seqno}
 </update>
 
 <!-- 게시물 수정 -->
@@ -140,8 +136,8 @@
 
 <!-- 댓글 등록 -->
 <insert id="replyRegistry" parameterType="com.board.dto.ReplyVO">
-	insert into tbl_reply (seqno, userid, replywriter, replycontent) values  
-		(#{seqno},#{userid},#{replywriter},#{replycontent})
+	insert into tbl_reply (replyseqno,seqno, userid, replywriter, replycontent, replyregdate) values  
+		(tbl_reply_seq.nextval,#{seqno},#{userid},#{replywriter},#{replycontent},sysdate)
 </insert>
 
 <!-- 댓글 수정 -->

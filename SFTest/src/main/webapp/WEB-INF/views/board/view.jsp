@@ -152,7 +152,7 @@ var username;
 
 	
 	}
-<!-- 좋아요, 싫어요 제이쿼리 처리 함수 끝-->
+
 
 
 	const deleteBoard = () => {

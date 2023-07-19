@@ -1,5 +1,9 @@
 package com.board.dto;
 
+import lombok.*;
+
+@Getter
+@Setter
 public class AddressVO {
 
 	private String zipcode;
@@ -7,21 +11,5 @@ public class AddressVO {
 	private String road;
 	private String building;
 	private String oldaddr;
-	
-	public String getZipcode() {
-		return zipcode;
-	}
-	public String getProvince() {
-		return province;
-	}
-	public String getRoad() {
-		return road;
-	}
-	public String getBuilding() {
-		return building;
-	}
-	public String getOldaddr() {
-		return oldaddr;
-	}
 	
 }

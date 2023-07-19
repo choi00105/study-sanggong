@@ -1,6 +1,6 @@
 import './App.css';
 import './exam.css';
-import { useEffect, useState, useRef, useContext, createContext, useMemo } from 'react';
+import { useEffect, useState, useRef, useContext, createContext, useMemo, useCallback } from 'react';
 
 // 1. useState 
 // 2. useEffect : 어떤 컴포넌트가 마운트(화면에 첫 랜더링 되는거), 업데이트(재랜더링), 언마운트(화면에서 사라질때)
@@ -12,10 +12,11 @@ import { useEffect, useState, useRef, useContext, createContext, useMemo } from 
     //따라서, 랜더링이 되더라도 초기화하면 안되는 값을 저장할때 유용. DOM요소에 접근 할 때 앨리먼트 내에 ref 속성을 만들고 이 ref 속성값을 이용해서 접근이 가능.
 // 4. useContext : Redux 또는 Redux Toolkit이 많이 사용됨. 데이터 공유 함수 Context로 공유한 데이터를 받아 오는 역할을 하는 함수
 // 5. useMemo : Memoization(반복된 계산을 매번 다시 수행하는 것이 아니라 캐싱 해놓은 결과를 불러내어서 재사용 하는 최적화 기법)기능을 수행
-    // usermemo 함수의 2번째 인자인 의존성 배열의 값이 변경 될 떄만 첫번째 인자인 콜백 함수를 실행 시키고, 실행이 안되었을 경우 기존 보관중인 "값"을 리턴
-    // userEffect 함수의 2번째 인자에 객체가 있는 경우에 발생하는 문제를 userMemo 함수는 해결할 방법이 있기 때문에
-    // userEffect 함수를 대신해서 사용되는 경우가 있음.
-// 6. userCallback : userMemo처럼 Memoization 기능을 수행하는 함수로 userMemo가 콜백함수의 리턴 값을 Memoiztion하는 것과 달리 
+    // useMemo 함수의 2번째 인자인 의존성 배열의 값이 변경 될 떄만 첫번째 인자인 콜백 함수를 실행 시키고, 실행이 안되었을 경우 기존 보관중인 "값"을 리턴
+    // useEffect 함수의 2번째 인자에 객체가 있는 경우에 발생하는 문제를 userMemo 함수는 해결할 방법이 있기 때문에
+    // useEffect 함수를 대신해서 사용되는 경우가 있음.
+// 6. useCallback : userMemo처럼 Memoization 기능을 수행하는 함수로 userMemo가 콜백함수의 리턴 값을 Memoization 것과 달리 
+    // 콜백함수 자체를 Memoization함.
 const App = () => {
   return (
     <div className='exam'> 
@@ -29,10 +30,18 @@ const App = () => {
       <Exam5></Exam5>
       <hr></hr>
       <Exam6></Exam6>
-      <h1>UserContext 예제</h1>
+      <h1>UseContext 예제</h1>
       <Exam7/>
-      <h1>UserMemo 예제</h1>
+      <h1>UseMemo 예제</h1>
       <Exam8/>
+      <h1>Exam9</h1>
+      <Exam9></Exam9>
+      <CopyTest></CopyTest>
+      <h1>useCallback 예제</h1>
+      <Exam10 />
+      <br></br>
+      <Exam11 />
+
     </div>
   );
 }
@@ -55,7 +64,7 @@ const Exam1 = () => {
 const Exam2 = () => {
   const [names, setNames] = useState(['김철수', '김민수']);
   const [input, setInput] = useState('');
-  const hadleInputChange = (e) => {
+  const handleInputChange = (e) => {
     setInput(e.target.value);
   }
   const handleClick = () => { // 불변성, 전개연산자(Spread 연산자)
@@ -64,7 +73,7 @@ const Exam2 = () => {
   }
   return (
     <div>
-      <input type='text' value={input} onChange={hadleInputChange} />
+      <input type='text' value={input} onChange={handleInputChange} />
       <button onClick={handleClick}>클릭</button>
       {/* map 함수는 자동으로 for 문을 실행 시켜서 인덱스와 값을 인자로 받아옴 */}
       {names.map((name, idx) => (
@@ -74,7 +83,7 @@ const Exam2 = () => {
   );
 }
 
-// useEfferct
+// useEffect
 const Exam3 = () => {
   const [count, setCount] = useState(1);
   const [name, setName] = useState('');
@@ -112,7 +121,7 @@ const Exam4 = () => {
     else btn_name = "타이머 실행";
   return (
     <div>
-      {/* showtimer가 true 일때 <Timer/>를 실행 */}
+      {/* showTimer가 true 일때 <Timer/>를 실행 */}
       {showTimer && <Timer />}
       <button onClick={()=>{setShowTimer(!showTimer)}}>{btn_name}</button>
     </div>
@@ -274,7 +283,8 @@ const Exam8 = () => {
   const hardSum = useMemo(() => {
     return hardCalculate(hardNumber);
   }, [hardNumber])
-  const easySum = easyCalulate(easyNumber);
+  // hardNum이 변경 될 떄만 콜백 함수가 실행, 변경이 일어나지 않으면 그 전에 가지고 있던 hardSum 값을 재사용
+  const easySum = easyCalculate(easyNumber);
   return (
     <div>
       <h3>짜증나는 계산기</h3>
@@ -296,11 +306,115 @@ const hardCalculate = (n) => {
   }
 }
 
-const easyCalulate = (n) => {
+const easyCalculate = (n) => {
   console.log("조금 덜 짜증나는 계산기 랜더링");
   return n + 100000
 }
 
+const Exam9 = () => {
+  const [number, setNumber] = useState(0);
+  const [isKorea, setIsKorea] = useState(true);
+  // const location = isKorea ? '한국' : '외국';
+  const location = useMemo(() => {
+    return {
+      country : isKorea? '한국': '외국',
+    }
+  }, [isKorea]);
 
+  useEffect(() => console.log("useEffect 호출"), [location]);
+  // useEffect(() => console.log("userEffect"), [location]); // location이 버뀔때만 값이 바뀌도록 함
+  return (
+    <div> 
+      <h3>하루에 몇끼 먹어요?</h3>
+      <input type='number' value={number} onChange={(e) => {setNumber(e.target.value)}} />
+      <hr />
+      <h3>어느 나라에 있나요?</h3>
+      <p>나라 : {location.country}</p>
+      <button onClick={() => setIsKorea(!isKorea)}>비행기 타자...</button>
+    </div>
+  );
+}
 
+// 얕은 복사, 깊은 복사 설명
+const CopyTest = () => {
+  const object = {
+    name: "김민수",
+    gender: "male"
+  };
+
+  const copy = {...object}; // 얕은 복사 : 메모리 주소 값을 복사
+  console.log(object === copy); // false
+  copy.gender = "female";
+  console.log("얕은 copy", copy); // 애만 female로 적용. 서로 다른 주소를 가지고 있음, 불변성을 유지한다.
+  console.log("object", object);
+
+  const object1 = {
+    name: "깁현주",
+    gender: 'female'
+  };
+
+  const copy1 = object1; // 깊은 복사 : 새로운 메모리 공간 확보해 완전히 복사(같은 주소값을 공유)
+  console.log(object1 === copy1); // true
+  copy1.gender = "male";
+  console.log('깊은 copy1', copy1); // 값이 둘다 바뀜 --> 동일한 주소를 공유함, 불변성을 유지하지 못함
+  console.log('object1', object1);
+}
+
+// useCallback 예제
+const Exam10 = () => {
+  const [number, setNumber] = useState(0);
+  const someFunction = useCallback(() => {
+    console.log(`someFunc : number : ${number}`);
+    return;
+    },[number]); // Template 표기법
+
+  useEffect(() => {console.log("someFunc가 변경 되었습니다.");},
+    [someFunction]);
+  
+  return (
+    <div>
+      <input type='number' value={number} onChange={(e) => setNumber(e.target.value)} />
+      <br />
+      <button onClick={someFunction}>Call someFunc</button>
+    </div>
+  );
+}
+
+const Exam11 = () => {
+  const [size, setSize] = useState(100);
+  const [isDark, setIsDark] = useState(false);
+
+  // size가 바뀔때 객체값을 createBoxStyle에 넣음(콜백)
+  const createBoxStyle = useCallback(() => {
+    return {
+    backgroundColor: 'red',
+    width: `${size}px`,
+    height: `${size}px`
+    }
+  },[size]);
+
+  return (
+    <div style={{backgroundColor:isDark?'black':'white'}}>
+      <input type='number' value={size} onChange={(e) => setSize(e.target.value)} />
+      <button onClick={()=> setIsDark(!isDark)}>Change Theme</button>
+      <Box createBoxStyle={createBoxStyle} />
+
+    </div>
+  );
+}
+
+const Box = ({createBoxStyle}) => {
+  const [style, setStyle] = useState({});
+
+  useEffect(() => {
+    console.log("박스 사이즈 확장");
+    setStyle(createBoxStyle);
+  },[createBoxStyle]);
+
+  return (
+    <div style={style}>
+
+    </div>
+  );
+}
 export default App;

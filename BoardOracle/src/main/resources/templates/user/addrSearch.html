@@ -62,7 +62,7 @@ a:active { color: red; }
 
 <div class="tableDiv">
 
-	<h1>주소 검색</h1>
+	<h1>주소DDDD 검색</h1>
 	<table class="InfoTable">
   		<tr>
    			<th>우편번호</th>
@@ -71,26 +71,25 @@ a:active { color: red; }
   		</tr>
 
  		<tbody>
- 		<c:if test="${list != null}">
-			<c:forEach items="${list}" var="list">
-			 	<tr onMouseover="this.style.background='#46D2D2';" onmouseout="this.style.background='white';">
-					<td>${list.zipcode}</td>
-					<td style="text-align:left;">${list.province}${list.road}${list.building}<br>${list.oldaddr}</td>  
-					<td><input type="button" value="선택" onclick="addrCheck('${list.zipcode}','${list.province}${list.road}${list.building}');" > </td>
-				</tr>
-			</c:forEach>
-		</c:if>	
-		<c:if test="${list == null}">
-			<tr>
-				<td colspan="3">검색된 주소가 없습니다.</td>
-			</tr>
-		</c:if>
+	<th:block th:if="${list != null}">
+		<tr th:each="item : ${list}" onMouseover="this.style.background='#46D2D2';" onmouseout="this.style.background='white';">
+			<td th:text="${item.zipcode}"></td>
+			<td style="text-align:left;">[[${item.province}]][[${item.road}]][[${item.building}]]<br>[[${item.oldaddr}]]</td>  
+			<td><input type="button" value="선택" th:onclick="addrCheck([[${item.zipcode}]],'[[${item.province}]]${{item.road}}${{item.building}}');" ></td>
+		
+		</tr>
+	</th:block>
+	<th:block th:if="${list == null}">
+		<tr>
+			<td colspan="3">검색된 주소가 없습니다.</td>
+		</tr>
+	</th:block>
+</tbody>
 
-		</tbody>
 	</table>
 
 	<div>
-		${pageListView}
+		[(${pageListView})]
 	</div>
 </div>
 </body>

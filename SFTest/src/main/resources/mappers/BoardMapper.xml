@@ -69,8 +69,6 @@
 	select stored_filename from tbl_file where seqno = #{seqno}
 </select>
 
-
-
 <!-- 게시물 상세 보기 -->
 <select id="view" parameterType="int" resultType="com.SFTest.dto.BoardVO">
 	select seqno,writer,userid,title,to_char(regdate,'YYYY-MM-DD HH24:MI:SS') as regdate,
@@ -85,9 +83,8 @@
 			content like concat('%',#{keyword},'%'))
 	]]>		 
 </select>
-<!-- id가 fileListView 인 무언가가 있어야... 모징?  -->
-<!-- 게시물 다음 보기 -->
 
+<!-- 게시물 다음 보기 -->
 <select id="next_seqno" parameterType="HashMap" resultType="int">
 	<![CDATA[
 	select ifnull(min(seqno),0) from tbl_board where seqno > #{seqno} and 

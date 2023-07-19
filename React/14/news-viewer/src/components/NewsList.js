@@ -21,7 +21,7 @@ const NewsList = ({ category }) => {
   const [loading, response, error] = usePromise(() => {
     const query = category === 'all' ? '' : `&category=${category}`;
     return axios.get(
-      `https://newsapi.org/v2ountry=kr${query}&apiKey=0a8c4202385d4ec1bb93b7e277b3c51f`,
+      `https://newsapi.org/v2/top-headlines?country=kr${query}&apiKey=0a8c4202385d4ec1bb93b7e277b3c51f`,
     );
   }, [category]);
 
@@ -31,7 +31,7 @@ const NewsList = ({ category }) => {
   }
   // 아직 response 값이 설정되지 않았을 때
   if (!response) {
-    return <NewsListBlock>에러 발생!</NewsListBlock>;
+    return null;
   }
 
   // 에러가 발생했을 때

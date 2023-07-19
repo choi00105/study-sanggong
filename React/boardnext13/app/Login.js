@@ -1,7 +1,7 @@
 'use client';
 import styles from './page.module.css'
 import getCookie from './GetCookie';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // client-side 에서만 사용
 import { useState, useRef, useEffect } from 'react';
 //import CryptoJS from 'crypto-js'; //AES 암호화 알고리즘으로 패스워드 쿠키를 암호화/복호화
 
@@ -23,7 +23,7 @@ const Login = () =>{
     const [message, setMessage] = useState('');
  
     let emailCookie = getCookie('email');
-    let emaliSaveCookie = getCookie('emailSave');    
+    let emailSaveCookie = getCookie('emailSave');    
     let passwordCookie = getCookie('password');
     let pwSaveCookie = getCookie('pwSave');
     let authkeyCookie = getCookie('authkey'); 
@@ -40,7 +40,7 @@ const Login = () =>{
     const checBoxConfirm = async () => {
 
         //email 쿠키 존재 여부 확인 후 email 쿠키가 존재하면 email state에 할당
-        if(emailCookie !== undefined && emaliSaveCookie === 'Y'){ //email 쿠키가 존재하면 
+        if(emailCookie !== undefined && emailSaveCookie === 'Y'){ //email 쿠키가 존재하면 
             setEmail(emailCookie); //email state에 email 쿠키값을 할당
             rememberEmailRef.current.checked = true; //email 기억 체크
         } else rememberEmailRef.current.checked = false;
@@ -171,7 +171,7 @@ const Login = () =>{
             .then((data) => {
                 if(data.message === 'JWT'){	
                     cookieManage(data.username, data.role, data.authkey, data.accessToken, data.refreshToken);
-                    router.push('/board/list?page=1');   
+                    router.push('/board/list?page=1');  // next.js 문법 
                 } else if(data.message === 'ID_NOT_FOUND') {
                         setMessage('존재하지 않는 이메일입니다.');
                 } else if(data.message === 'PASSWORD_NOT_FOUND') {

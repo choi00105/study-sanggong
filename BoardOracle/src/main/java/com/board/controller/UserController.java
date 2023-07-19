@@ -155,6 +155,7 @@ public class UserController {
 		
 		int postNum = 5;
 		int startPoint = (pageNum -1)*postNum; //테이블에서 읽어 올 행의 위치
+		int endPoint = pageNum*postNum;
 		int listCount = 10;
 		
 		Page page = new Page();

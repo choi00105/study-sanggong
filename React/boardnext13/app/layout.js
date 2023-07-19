@@ -5,8 +5,8 @@ import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: '게시판',
-  description: '제작자 : 김현우',
+  title: 'Next.js 게시판',
+  description: '제작자 : 최대훈',
 }
 
 export default function RootLayout({ children }) {

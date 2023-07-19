@@ -1,6 +1,6 @@
 package com.board.service;
 
-import java.util.List;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,8 +58,11 @@ public class UserServiceImpl implements UserService {
 
 	//주소 검색
 	@Override
-	public List<AddressVO> addrSearch(int startPoint, int postNum, String addrSearch){
-		return mapper.addrSearch(startPoint, postNum, addrSearch);
+	public List<AddressVO> addrSearch(int startPoint, int endPoint, String addrSearch){
+		Map<String, Object> data = new HashMap<>();
+		data.put("startPoint", startPoint);
+		data.put("endPoint", endPoint);
+		data.put("addrSearch", addrSearch);
+		return mapper.addrSearch(data);
 	}
-
 }

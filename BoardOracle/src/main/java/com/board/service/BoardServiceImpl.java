@@ -1,7 +1,6 @@
 package com.board.service;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +19,12 @@ public class BoardServiceImpl implements BoardService {
 
 	//게시물 목록 보기
 	@Override
-	public List<BoardVO> list(int startPoint, int postNum, String keyword) {
-		return mapper.list(startPoint,postNum,keyword);
+	public List<BoardVO> list(int startPoint, int endPoint, String keyword) {
+		Map<String, Object> data = new HashMap<>();
+		data.put("startPoint", startPoint);
+		data.put("endPoint", endPoint);
+		data.put("keyword", keyword);
+		return mapper.list(data);
 	}
 	
 	//게시물 전체 갯수 계산
@@ -29,7 +32,12 @@ public class BoardServiceImpl implements BoardService {
 	public int getTotalCount(String keyword) {
 		return mapper.getTotalCount(keyword);
 	}
-
+	//게시물 번호 구하기
+	@Override
+	public int getSeqnoWithNextval() {
+		return mapper.getSeqnoWithNextval();
+	}
+	
 	//게시물 등록
 	@Override
 	public void write(BoardVO board) {
@@ -81,13 +89,19 @@ public class BoardServiceImpl implements BoardService {
 	//이전 보기
 	@Override
 	public int pre_seqno(int seqno, String keyword) {
-		return mapper.pre_seqno(seqno, keyword);
+		Map<String, Object> data = new HashMap<>();
+		data.put("seqno", seqno);
+		data.put("keyword", keyword);
+		return mapper.pre_seqno(data);
 	}
 	
 	//다음 보기
 	@Override
 	public int next_seqno(int seqno, String keyword) {
-		return mapper.next_seqno(seqno, keyword);
+		Map<String, Object> data = new HashMap<>();
+		data.put("seqno", seqno);
+		data.put("keyword", keyword);
+		return mapper.next_seqno(data);
 	}
 	//조회수 등록
 	@Override
@@ -110,13 +124,20 @@ public class BoardServiceImpl implements BoardService {
 	//좋아요/싫어요 확인 가져 오기
 	@Override
 	public LikeVO likeCheckView(int seqno,String userid) throws Exception {
-		return mapper.likeCheckView(seqno, userid);
+		Map<String, Object> data = new HashMap<>();
+		data.put("seqno", seqno);
+		data.put("userid", userid);
+		return mapper.likeCheckView(data);
 	}
 	
 	//좋아요/싫어요 갯수 수정하기
 	@Override
 	public void boardLikeUpdate(int seqno, int likecnt, int dislikecnt) throws Exception {
-		mapper.boardLikeUpdate(seqno, likecnt, dislikecnt);
+		Map<String, Object> data = new HashMap<>();
+		data.put("seqno", seqno);
+		data.put("likecnt", likecnt);
+		data.put("dislikecnt", dislikecnt);
+		mapper.boardLikeUpdate(data);
 	}
 	
 	//좋아요/싫어요 확인 등록하기

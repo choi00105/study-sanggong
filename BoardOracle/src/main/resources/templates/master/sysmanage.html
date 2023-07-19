@@ -46,7 +46,11 @@
 
 </head>
 <body>
-
+<script>
+	const userid = '[[${session.userid}]]';
+	if(userid == ''||role != 'MASTER')
+		document.location.href='/user/login';
+</script>
 <div class="menubar">
 	<ul class="main_menu">
 		<li><a href="/board/list?page=1">홈으로</a></li>

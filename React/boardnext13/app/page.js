@@ -1,5 +1,5 @@
 import styles from './page.module.css'
-import Link from 'next/link'
+import Link from 'next/link' //server-side 에만 사용
 import Login from './Login';
 
 const Home = () =>{

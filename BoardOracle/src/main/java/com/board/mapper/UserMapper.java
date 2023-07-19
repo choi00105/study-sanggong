@@ -1,6 +1,7 @@
 package com.board.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -32,6 +33,6 @@ public interface UserMapper {
 	public int addrTotalCount(String addrSearch);
 
 	//주소 검색
-	public List<AddressVO> addrSearch(int startPoint, int postNum, String addrSearch);
+	public List<AddressVO> addrSearch(Map<String, Object> data);
 	
 }

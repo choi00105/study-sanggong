@@ -158,22 +158,43 @@
 		else 			
 			uploadURL = '/board/modify';
 		
-		formData.append("seqno",${view.seqno});
-			     
+		const seqno = '[[${view.seqno}]]';
+		formData.append("seqno",parseInt(seqno));
+		
+		console.log(typeof formData + parseInt(seqno));
+		console.log(formData);
+		
+		const dataArray = Array.from(formData.entries());
+		console.log(dataArray);
 		await fetch(uploadURL, {
 			
 			method: 'POST',
 			body: formData			
 			
-		}).then((response)=> response.json())
+		}).then((response)=> {
+			console.log("response 받는가?");
+			console.log(response);
+			console.log(response.headers);
+			console.log(response.status); // 200 성고이라고 뜸
+			console.log(response.headers.get('Content-Type')) //text/html;charset=UTF-8 뜸 왜?
+			console.log(response.json()); // message에서 json 아니라 에러라고 뜸
+			//response.json();
+		})
 		  .then((data) => {
+			  console.log(data);
 			  if(data.message == 'good'){
+				  console.log("data 받고 도는가?" + data);
 				alert("게시물이 수정되었습니다.");
-				document.location.href='/board/view?seqno=${view.seqno}&page=${page}&keyword=${keyword}';
+	        	const seqno = '[[${view.seqno}]]';
+	        	const page = '[[${page}]]';
+	        	const searchType = '[[${searchType}]]';
+	        	const keyword = '[[${keyword}]]';
+	        	
+	        	document.location.href='/board/view?seqno='+ seqno + '&page=' + page + '&keyword=' + keyword;
 			  }	
 		}).catch((error)=> { 
 			alert("시스템 장애로 게시물 수정이 실패했습니다.");
-			console.log((error)=> console.log("error = " + error))
+			console.log("error = " + error);
 		}); 
 		
 	}
@@ -316,7 +337,6 @@ a:active { color: red; }
   height:80px;
   color: white;
   text-align: center;
-  vertical-align: middle;
   padding: 5px;
   font-size:120%;
   display: block;
@@ -354,42 +374,36 @@ a:active { color: red; }
 
 </head>   
 <body>
-
-<%
-
-	String userid = (String)session.getAttribute("userid");
-	String username = (String)session.getAttribute("username");
-	if(userid == null) response.sendRedirect("/");
-
-%>
+<script>
+	const userid = '[[${session.userid}]]';
+	if(userid == '')
+		document.location.href='/user/login';
+</script>
 
   	<div>
-    	<img id="topBanner" src ="/resources/images/logo.jpg" title="서울기술교육센터" >
+    	<img id="topBanner" src ="/images/logo.jpg" title="서울기술교육센터" >
   	</div>
 
 	<div class='main'>
 		<h1>게시물 수정</h1>
 		<div class="FormDiv">
 			<form id="ModifyForm" method="POST" >
-				<input type="text" class="writer" id="writer" value="작성자 : <%=username %> 님" diasabled>
-				<input type="text" class="title" id="title" name="title"  value="${view.title}">
-				<input type="hidden" name="seqno" value="${view.seqno}">
-				<input type="hidden" name="writer" value="${view.writer}">
-				<input type="hidden" name="userid" value="${view.userid}">
-				<input type="hidden" name="page" value="${page}">
-				<input type="hidden" name="searchType" value="${searchType}">
-				<input type="hidden" name="keyword" value="${keyword}">
-				<textarea class="content" id="content" cols="100" rows="500" name="content">${view.content}</textarea>
-				<c:if test="${fileListView != null }">
+				<input type="text" class="writer" id="writer" th:value="${session.username}" disabled>
+				<input type="text" class="title" id="title" name="title"  th:value="${view.title}">
+				<input type="hidden" name="seqno" th:value="${view.seqno}">
+				<input type="hidden" name="writer" th:value="${view.writer}">
+				<input type="hidden" name="userid" th:value="${view.userid}">
+				<input type="hidden" name="page" th:value="${page}">
+				<input type="hidden" name="keyword" th:value="${keyword}">
+				<textarea class="content" id="content" cols="100" rows="500" name="content" th:text="${view.content}"></textarea>
+				<th:block th:if="${fileListView != null }">
 		         	<div id="fileList">	
-		         		<p style="text-align:left;">
-		        	 		<c:forEach items="${fileListView}" var="file" >
-		         				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;삭제 : <input type="checkbox" name="deleteFileList" value="${file.fileseqno}"> 
-		         				 ${file.org_filename}&nbsp( ${file.filesize} Byte)<br>
-			         		</c:forEach>
-		         		</p>
+		         		<span style="position:relative;left:10px;text-align:left;" th:each="file:${fileListView}">
+		         		삭제 : <label><input type="checkbox" name="deleteFileList" th:value="${file.fileseqno}"> 
+		         			[[${file.org_filename}]]&nbsp;( [[${file.filesize}]] Byte)</label><br>
+		         		</span>
 		         	</div>       
-		        </c:if>
+		        </th:block>
         		<div class="fileuploadForm">
 					<input type="file" id="inputFile" name="uploadFile" style="display:none;" multiple />
 					<div class="fileZone" id="fileZone">파일 첨부를 하기 위해서는 클릭하거나 여기로 파일을 드래그 하세요.<br>첨부파일은 최대 5개까지 등록이 가능합니다.</div>

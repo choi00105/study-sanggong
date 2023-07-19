@@ -14,10 +14,13 @@ import com.board.dto.ReplyVO;
 public interface BoardMapper {
 
 	//게시물 목록 보기
-	public List<BoardVO> list(int startPoint,int postNum, String keyword);
+	public List<BoardVO> list(Map<String,Object> data);
 	
 	//게시물 전체 갯수 계산
 	public int getTotalCount(String keyword);
+	
+	//게시물 번호 구하기
+	public int getSeqnoWithNextval();
 	
 	//게시물 등록
 	public void write(BoardVO board);
@@ -44,10 +47,10 @@ public interface BoardMapper {
 	public BoardVO view(int seqno);
 	
 	//이전 보기 
-	public int pre_seqno(int seqno, String keyword);
+	public int pre_seqno(Map<String,Object> data);
 	
 	//다음 보기
-	public int next_seqno(int seqno, String keyword);
+	public int next_seqno(Map<String,Object> data);
 	
 	//조회수 업데이트
 	public void hitno(BoardVO board);
@@ -59,10 +62,10 @@ public interface BoardMapper {
 	public void delete(int seqno);
 	
 	//좋아요/싫어요 확인 가져 오기
-	public LikeVO likeCheckView(int seqno,String userid) throws Exception;
+	public LikeVO likeCheckView(Map<String,Object> data) throws Exception;
 	
 	//좋아요/싫어요 갯수 수정하기
-	public void boardLikeUpdate(int seqno, int likecnt, int dislikecnt) throws Exception;
+	public void boardLikeUpdate(Map<String,Object> data) throws Exception;
 	
 	//좋아요/싫어요 확인 등록하기
 	public void likeCheckRegistry(Map<String,Object> map) throws Exception;

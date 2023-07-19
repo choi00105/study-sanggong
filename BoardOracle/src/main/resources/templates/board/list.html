@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="/resources/css/board.css">
+<link rel="stylesheet" href="/css/board.css">
 <title>게시물 목록 보기</title>
 <style>
 .bottom_menu {
@@ -69,16 +69,13 @@
 
 </head>
 <body>
-
-<%
-
-	String userid = (String)session.getAttribute("userid");
-	if(userid == null) response.sendRedirect("/user/login");
-
-%>
-
+<script>
+	const userid = '[[${session.userid}]]';
+	if(userid == '')
+		document.location.href='/user/login';
+</script>
 <div>
-	<img id="topBanner" src="/resources/images/logo.jpg" title="서울기술교육센터">	
+	<img id="topBanner" src="/images/logo.jpg" title="서울기술교육센터">	
 </div>
 
 <div class="tableDiv">
@@ -98,36 +95,34 @@
 		</tr>
 		
 		<tbody>
-		<c:if test="${list != null}">
-			<c:forEach items="${list}" var="list">
-				<tr onmouseover="this.style.background='#46D2D2'" onmouseout="this.style.background='white'">
-					<td>${list.seq}</td>
-					<td style="text-align:left"><a id="hypertext" href="/board/view?seqno=${list.seqno}&page=${page}&keyword=${keyword}" 
-						onmouseover="this.style.textDecoration='underline'"  
-						onmouseout="this.style.textDecoration='none'">${list.title}</a></td>
-					<td>${list.writer}</td>
-					<td>${list.regdate}</td>				
-					<td>${list.hitno}</td>
-				</tr>
-			</c:forEach>			
-		</c:if>
-		<c:if test="${list == null}">
+		<th:block th:if="${list != null}">
+			<tr th:each="list:${list}" onmouseover="this.style.background='#46D2D2'" onmouseout="this.style.background='white'">
+				<td th:text="${list.seq}"></td>
+				<td style="text-align:left"><a id="hypertext" th:href="@{'/board/view?seqno=' + ${list.seqno}+ '&page=' + ${page} + '&keyword=' + ${keyword}}" 
+					onmouseover="this.style.textDecoration='underline'"  
+					onmouseout="this.style.textDecoration='none'">[[${list.title}]]</a></td>
+				<td th:text="${list.writer}"></td>
+				<td th:text="${list.regdate}"></td>				
+				<td th:text="${list.hitno}"></td>
+			</tr>
+		</th:block>
+		<th:block th:if="${list == null}">
 			<tr>
 				<td colspan="5">등록된 게시물이 없습니다.</td>
 			</tr>
-		</c:if>	
+		</th:block>
 		</tbody>	
 	</table>
 	<br>
-	<div>${pageList}</div>
+	<div>[(${pageList})]</div>
 	<br>
 	<div class="bottom_menu">
 		<a href="/board/list?page=1">처음으로</a>&nbsp;&nbsp;
 		<a href="/board/write">글쓰기</a>&nbsp;&nbsp;
 		<a href="/user/userinfo">사용자관리</a>&nbsp;&nbsp;
-		<c:if test="${role == 'MASTER'}">
+		<th:block th:if="${session.role == 'MASTER'}">
 			<a href="/master/sysmanage">시스템관리</a>&nbsp;&nbsp;
-		</c:if>
+		</th:block>
 		<a href="javascript:logout()">로그아웃</a>		
 	</div>
 	<br><br>
